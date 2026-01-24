@@ -1,5 +1,61 @@
 # MMDetection Project Setup: `ez_mmdet`
 
+---
+## 🚀 Quick Start
+
+### 1. Prerequisites
+
+Ensure you have `uv` installed. If not, run:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+```
+
+### 2. Standard Installation (Automated)
+
+This project is configured to handle the complex MMDetection build dependencies automatically via `uv sync`.
+
+```bash
+# Clone the repository
+git clone https://github.com/JustAnalyze/ez_mmdet.git
+cd ez_mmdet
+
+# Install everything (including CPU-specific Torch and MMCV)
+uv sync --extra cpu --preview
+
+```
+
+### 3. Manual Bootstrap (If `uv sync` fails)
+
+If you encounter `ModuleNotFoundError` during the sync, the environment may need a manual "seed" to help MMDetection's legacy `setup.py` run:
+
+```bash
+# 1. Install build-essential tools first
+uv pip install setuptools==69.5.1 --index-strategy unsafe-best-match
+
+# 2. Install the CPU engine
+uv pip install wheel torch==1.13.0+cpu --index https://download.pytorch.org/whl/cpu
+
+# 3. Finalize the project sync
+uv sync --extra cpu --no-build-isolation --preview
+
+```
+---
+
+## 🛠 Installation Verification
+
+*(Your existing verification section continues here...)*
+
+---
+
+### Why this structure works:
+
+* **The "Standard" way:** It leverages all the hard work we did on your `pyproject.toml`. For most users, `uv sync` will just work because of the `extra-build-dependencies` we added.
+* **The "Bootstrap" way:** It keeps those specific commands you mentioned as a clear "Plan B." This is helpful for environments with strict network or cache settings.
+* **Hardware Clarity:** It explicitly mentions `--extra cpu`, which is helpful for others who might be looking for a GPU setup later.
+
+**Would you like me to add a "Troubleshooting" section at the bottom to explain why `setuptools==69.5.1` is specifically required for this build?**
 ## 🛠 Installation Verification
 
 Before starting any development or training, ensure your environment is correctly configured.
