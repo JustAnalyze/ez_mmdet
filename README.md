@@ -58,18 +58,7 @@ uv run python mmdetection/mmdet/utils/collect_env.py
 
 ```
 
-### 2. Functional Sanity Check
-
-Run the custom verification script to ensure the C++ extensions (`_ext`) are correctly loaded and operational on your hardware.
-
-```bash
-uv run python verify_install.py
-
-```
-
-_A successful output should show: `✅ Success! Output shape: torch.Size([1, 3, 7, 7])`._
-
-### 3. Inference Demo (CPU/GPU)
+### 2. Inference Demo (CPU/GPU)
 
 Run a basic inference test on a sample image to verify the full model pipeline.
 
