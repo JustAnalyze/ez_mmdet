@@ -1,0 +1,79 @@
+[project]
+name = "ez_mmdet"
+version = "0.1.0"
+description = "MMDetection setup for CPU or GPU"
+readme = "README.md"
+requires-python = ">=3.9,<3.11"
+# Move hardware-specific deps out of here and into [project.optional-dependencies]
+dependencies = [
+    "mmengine>=0.10.7",
+    "openmim>=0.3.9",
+    "setuptools==69.5.1",
+    "wheel>=0.46.3",
+    "mmdet",
+    "pycocotools>=2.0.7"
+]
+
+[project.optional-dependencies]
+# User chooses one of these
+cpu = [
+    "torch==1.13.0+cpu",
+    "torchvision==0.14.0+cpu",
+    "torchaudio==0.13.0+cpu",
+    "mmcv==2.1.0",
+]
+gpu = [
+    "torch==1.13.0+cu117",
+    "torchvision==0.14.0+cu117",
+    "torchaudio==0.13.0",
+    "mmcv>=2.0.0rc4, <2.2.0",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu117"
+url = "https://download.pytorch.org/whl/cu117"
+explicit = true
+
+[[tool.uv.index]]
+name = "mmcv-cpu"
+url = "https://download.openmmlab.com/mmcv/dist/cpu/torch1.13/index.html"
+explicit = true
+
+[tool.uv.sources]
+# CPU: Point directly to the specific wheel file on the OpenMMLab server
+mmcv = [
+  # Wheel for Python 3.10
+  { url = "https://download.openmmlab.com/mmcv/dist/cpu/torch1.13.0/mmcv-2.1.0-cp310-cp310-manylinux1_x86_64.whl", marker = "extra == 'cpu' and python_version == '3.10'" },
+  # Wheel for Python 3.9
+  { url = "https://download.openmmlab.com/mmcv/dist/cpu/torch1.13.0/mmcv-2.1.0-cp39-cp39-manylinux1_x86_64.whl", marker = "extra == 'cpu' and python_version == '3.9'" }
+]
+
+# Torch mappings
+torch = [
+  { index = "pytorch-cpu", marker = "extra == 'cpu'" },
+  { index = "pytorch-cu117", marker = "extra == 'gpu' and extra != 'cpu'" }
+]
+torchvision = [
+  { index = "pytorch-cpu", marker = "extra == 'cpu'" },
+  { index = "pytorch-cu117", marker = "extra == 'gpu' and extra != 'cpu'" }
+]
+torchaudio = [
+  { index = "pytorch-cpu", marker = "extra == 'cpu'" }
+]
+
+mmdet = { workspace = true }
+
+[tool.uv.workspace]
+members = ["mmdetection"]
+
+[tool.uv]
+no-build-isolation-package = ["mmdet"]
+
+[tool.uv.extra-build-dependencies]
+mmdet = ["torch", "setuptools==69.5.1", "wheel"]
+attributee = ["setuptools==69.5.1"]
