@@ -8,3 +8,13 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Ignore build and installation files
+mmdetection/build/
+mmdetection/dist/
+mmdetection/*.egg-info/
+
+# Ignore checkpoints/weights (these are huge!)
+mmdetection/checkpoints/
+*.pth
+*.pkl
