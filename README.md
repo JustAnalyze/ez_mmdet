@@ -1,6 +1,7 @@
 # MMDetection Project Setup: `ez_mmdet`
 
 ---
+
 ## 🚀 Quick Start
 
 ### 1. Prerequisites
@@ -41,21 +42,9 @@ uv pip install wheel torch==1.13.0+cpu --index https://download.pytorch.org/whl/
 uv sync --extra cpu --no-build-isolation --preview
 
 ```
----
-
-## 🛠 Installation Verification
-
-*(Your existing verification section continues here...)*
 
 ---
 
-### Why this structure works:
-
-* **The "Standard" way:** It leverages all the hard work we did on your `pyproject.toml`. For most users, `uv sync` will just work because of the `extra-build-dependencies` we added.
-* **The "Bootstrap" way:** It keeps those specific commands you mentioned as a clear "Plan B." This is helpful for environments with strict network or cache settings.
-* **Hardware Clarity:** It explicitly mentions `--extra cpu`, which is helpful for others who might be looking for a GPU setup later.
-
-**Would you like me to add a "Troubleshooting" section at the bottom to explain why `setuptools==69.5.1` is specifically required for this build?**
 ## 🛠 Installation Verification
 
 Before starting any development or training, ensure your environment is correctly configured.
