@@ -405,7 +405,7 @@ wheels = [
 [[package]]
 name = "ez-mmdet"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "mmdet" },
     { name = "mmengine" },
@@ -438,7 +438,9 @@ requires-dist = [
     { name = "pycocotools", specifier = ">=2.0.7" },
     { name = "setuptools", specifier = "==69.5.1" },
     { name = "torch", marker = "extra == 'cpu'", specifier = "==1.13.0+cpu", index = "https://download.pytorch.org/whl/cpu" },
+    { name = "torch", marker = "extra != 'cpu' and extra == 'gpu'", specifier = "==1.13.0+cpu", index = "https://download.pytorch.org/whl/cu117" },
     { name = "torch", marker = "extra != 'cpu' and extra == 'gpu'", specifier = "==1.13.0+cu117", index = "https://download.pytorch.org/whl/cu117" },
+    { name = "torch", marker = "extra != 'cpu' and extra != 'gpu'", specifier = "==1.13.0+cpu" },
     { name = "torch", marker = "extra == 'cpu' and extra == 'gpu'", specifier = "==1.13.0+cu117", index = "https://download.pytorch.org/whl/cpu" },
     { name = "torchaudio", marker = "extra == 'cpu'", specifier = "==0.13.0+cpu", index = "https://download.pytorch.org/whl/cpu" },
     { name = "torchaudio", marker = "extra != 'cpu' and extra == 'gpu'", specifier = "==0.13.0" },

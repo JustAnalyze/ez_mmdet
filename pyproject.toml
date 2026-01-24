@@ -6,9 +6,10 @@ readme = "README.md"
 requires-python = ">=3.9,<3.11"
 # Move hardware-specific deps out of here and into [project.optional-dependencies]
 dependencies = [
+    "setuptools==69.5.1",
+    "torch==1.13.0+cpu",
     "mmengine>=0.10.7",
     "openmim>=0.3.9",
-    "setuptools==69.5.1",
     "wheel>=0.46.3",
     "mmdet",
     "pycocotools>=2.0.7"
@@ -73,7 +74,22 @@ members = ["mmdetection"]
 
 [tool.uv]
 no-build-isolation-package = ["mmdet"]
+index-strategy = "unsafe-best-match"
 
 [tool.uv.extra-build-dependencies]
 mmdet = ["torch", "setuptools==69.5.1", "wheel"]
 attributee = ["setuptools==69.5.1"]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+# We tell it to look in the current directory but exclude the troublemakers
+where = ["."]
+exclude = ["mmdetection*", "output_test*"]
+
+[tool.setuptools]
+# This tells setuptools that ez_mmdet doesn't have its own 
+# code folder yet (since it's mostly a wrapper/manager)
+py-modules = []
