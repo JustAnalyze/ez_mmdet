@@ -18,3 +18,7 @@ mmdetection/*.egg-info/
 mmdetection/checkpoints/
 *.pth
 *.pkl
+
+# Local directories
+runs/
+dummy_data/

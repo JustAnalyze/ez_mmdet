@@ -1,14 +1,18 @@
 [project]
 name = "ez_mmdet"
 version = "0.1.0"
-description = "MMDetection setup for CPU or GPU"
+description = "A user-friendly API for MMDetection"
 readme = "README.md"
 requires-python = ">=3.9,<3.11"
 dependencies = [
     "mmengine>=0.10.7",
     "openmim>=0.3.9",
     "mmdet",
-    "pycocotools>=2.0.7"
+    "pycocotools>=2.0.7",
+    "pydantic>=2.0.0",
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "loguru>=0.7.3",
 ]
 
 [project.optional-dependencies]
@@ -88,5 +92,33 @@ mmdet = ["setuptools==69.5.1", "wheel", "torch==1.13.1+cpu"]
 requires = ["setuptools>=69.5.1", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "pytest>=8.4.2",
+    "ruff>=0.14.14",
+]
+
 [tool.setuptools]
 packages = []
+
+[tool.ruff]
+line-length = 88
+indent-width = 4
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "D"] # D for Docstrings
+ignore = ["D100", "D104"] # Ignore missing docstring in public module/package
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true # Often needed for MMDet internals
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = ["tests"]
