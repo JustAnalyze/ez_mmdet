@@ -47,12 +47,25 @@ name = "pytorch-cu117"
 url = "https://download.pytorch.org/whl/cu117"
 explicit = true
 
+[[tool.uv.index]]
+name = "mmcv-cpu"
+url = "https://download.openmmlab.com/mmcv/dist/cpu/torch1.13/index.html"
+explicit = true
+
 [tool.uv.workspace]
 members = ["mmdetection"]
 
 [tool.uv.sources]
 # This name MUST match the 'name' field inside mmdetection/pyproject.toml
 mmdet = { workspace = true }
+
+# CPU: Point directly to the specific wheel file on the OpenMMLab server
+mmcv = [
+  # Wheel for Python 3.10
+  { url = "https://download.openmmlab.com/mmcv/dist/cpu/torch1.13.0/mmcv-2.1.0-cp310-cp310-manylinux1_x86_64.whl", marker = "extra == 'cpu' and python_version == '3.10'" },
+  # Wheel for Python 3.9
+  { url = "https://download.openmmlab.com/mmcv/dist/cpu/torch1.13.0/mmcv-2.1.0-cp39-cp39-manylinux1_x86_64.whl", marker = "extra == 'cpu' and python_version == '3.9'" }
+]
 
 # Map torch/vision/audio to the correct custom indexes
 torch = [

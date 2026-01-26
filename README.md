@@ -36,7 +36,7 @@ If you encounter `ModuleNotFoundError` during the sync, the environment may need
 uv pip install setuptools==69.5.1 --index-strategy unsafe-best-match
 
 # 2. Install the CPU engine
-uv pip install wheel torch==1.13.0+cpu --index https://download.pytorch.org/whl/cpu
+uv pip install wheel torch==1.13.1+cpu --index https://download.pytorch.org/whl/cpu
 
 # 3. Finalize the project sync
 uv sync --extra cpu --no-build-isolation --preview
