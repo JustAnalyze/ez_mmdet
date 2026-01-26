@@ -4,31 +4,38 @@ version = "0.1.0"
 description = "MMDetection setup for CPU or GPU"
 readme = "README.md"
 requires-python = ">=3.9,<3.11"
-# Move hardware-specific deps out of here and into [project.optional-dependencies]
 dependencies = [
-    "setuptools==69.5.1",
-    "torch==1.13.0+cpu",
     "mmengine>=0.10.7",
     "openmim>=0.3.9",
-    "wheel>=0.46.3",
     "mmdet",
     "pycocotools>=2.0.7"
 ]
 
 [project.optional-dependencies]
-# User chooses one of these
 cpu = [
-    "torch==1.13.0+cpu",
-    "torchvision==0.14.0+cpu",
-    "torchaudio==0.13.0+cpu",
+    "torch==1.13.1+cpu",
+    "torchvision==0.14.1+cpu",
+    # Logic: Linux expects +cpu, Windows expects standard 0.13.1
+    "torchaudio==0.13.1+cpu; sys_platform == 'linux'",
+    "torchaudio==0.13.1; sys_platform == 'win32'",
     "mmcv==2.1.0",
 ]
 gpu = [
-    "torch==1.13.0+cu117",
-    "torchvision==0.14.0+cu117",
-    "torchaudio==0.13.0",
+    "torch==1.13.1+cu117",
+    "torchvision==0.14.1+cu117",
+    "torchaudio==0.13.1",
     "mmcv>=2.0.0rc4, <2.2.0",
 ]
+
+[tool.uv]
+managed = true
+package = true
+# Restrict resolution to Windows and Linux only
+environments = [
+    "sys_platform == 'win32'",
+    "sys_platform == 'linux'"
+]
+no-build-isolation-package = ["mmdet"]
 
 [[tool.uv.index]]
 name = "pytorch-cpu"
@@ -40,21 +47,14 @@ name = "pytorch-cu117"
 url = "https://download.pytorch.org/whl/cu117"
 explicit = true
 
-[[tool.uv.index]]
-name = "mmcv-cpu"
-url = "https://download.openmmlab.com/mmcv/dist/cpu/torch1.13/index.html"
-explicit = true
+[tool.uv.workspace]
+members = ["mmdetection"]
 
 [tool.uv.sources]
-# CPU: Point directly to the specific wheel file on the OpenMMLab server
-mmcv = [
-  # Wheel for Python 3.10
-  { url = "https://download.openmmlab.com/mmcv/dist/cpu/torch1.13.0/mmcv-2.1.0-cp310-cp310-manylinux1_x86_64.whl", marker = "extra == 'cpu' and python_version == '3.10'" },
-  # Wheel for Python 3.9
-  { url = "https://download.openmmlab.com/mmcv/dist/cpu/torch1.13.0/mmcv-2.1.0-cp39-cp39-manylinux1_x86_64.whl", marker = "extra == 'cpu' and python_version == '3.9'" }
-]
+# This name MUST match the 'name' field inside mmdetection/pyproject.toml
+mmdet = { workspace = true }
 
-# Torch mappings
+# Map torch/vision/audio to the correct custom indexes
 torch = [
   { index = "pytorch-cpu", marker = "extra == 'cpu'" },
   { index = "pytorch-cu117", marker = "extra == 'gpu' and extra != 'cpu'" }
@@ -64,38 +64,16 @@ torchvision = [
   { index = "pytorch-cu117", marker = "extra == 'gpu' and extra != 'cpu'" }
 ]
 torchaudio = [
-  { index = "pytorch-cpu", marker = "extra == 'cpu'" }
+  { index = "pytorch-cpu", marker = "extra == 'cpu'" },
+  { index = "pytorch-cu117", marker = "extra == 'gpu' and extra != 'cpu'" }
 ]
-
-mmdet = { workspace = true }
-
-[tool.uv.workspace]
-members = ["mmdetection"]
-
-[tool.uv]
-no-build-isolation-package = ["mmdet"]
-index-strategy = "unsafe-best-match"
 
 [tool.uv.extra-build-dependencies]
-# This injects the tools into the "build room" before MMDetection runs setup.py
-mmdet = [
-    "setuptools==69.5.1", 
-    "wheel", 
-    "torch==1.13.0+cpu"
-]
-# For your other internal packages
-attributee = ["setuptools==69.5.1"]
+mmdet = ["setuptools==69.5.1", "wheel", "torch==1.13.1+cpu"]
 
 [build-system]
 requires = ["setuptools>=69.5.1", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-# We tell it to look in the current directory but exclude the troublemakers
-where = ["."]
-exclude = ["mmdetection*", "output_test*"]
-
 [tool.setuptools]
-# This tells setuptools that ez_mmdet doesn't have its own 
-# code folder yet (since it's mostly a wrapper/manager)
-py-modules = []
+packages = []

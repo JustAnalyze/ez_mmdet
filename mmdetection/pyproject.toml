@@ -6,5 +6,5 @@ description = "Minimal wrapper for mmdet"
 dynamic = ["dependencies", "optional-dependencies", "readme", "authors", "classifiers", "keywords", "license"]
 
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["torch==1.13.1", "setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
