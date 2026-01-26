@@ -25,6 +25,10 @@ cd ez_mmdet
 # Install everything (including CPU-specific Torch and MMCV)
 uv sync --extra cpu --preview
 
+# Or for CUDA/GPU support
+uv sync --extra gpu --preview
+
+
 ```
 
 ### 3. Manual Bootstrap (If `uv sync` fails)
