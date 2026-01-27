@@ -59,12 +59,8 @@ name = "mmcv-cpu"
 url = "https://download.openmmlab.com/mmcv/dist/cpu/torch1.13/index.html"
 explicit = true
 
-[tool.uv.workspace]
-members = ["mmdetection"]
-
 [tool.uv.sources]
-# This name MUST match the 'name' field inside mmdetection/pyproject.toml
-mmdet = { workspace = true }
+mmdetection = { path = "./libs/mmdetection", editable = true }
 
 # CPU: Point directly to the specific wheel file on the OpenMMLab server
 mmcv = [

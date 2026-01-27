@@ -10,17 +10,21 @@ class ConfigLoader:
     def __init__(self):
         # Assumes the script is running from the project root where 'mmdetection' folder exists
         self._project_root = Path.cwd()
-        self._config_root = self._project_root / "mmdetection" / "configs"
+        self._config_root = self._project_root / "libs" / "mmdetection" / "configs"
         self._config_map: Dict[str, Path] = {}
         self._scanned = False
-        logger.info(f"Initializing ConfigLoader. Project root: {self._project_root}, Config root: {self._config_root}")
+        logger.info(
+            f"Initializing ConfigLoader. Project root: {self._project_root}, Config root: {self._config_root}"
+        )
 
         self._validate_root()
 
     def _validate_root(self):
         """Ensures the frozen repo exists."""
         if not self._config_root.exists():
-            logger.error(f"Could not find local mmdetection configs at: {self._config_root}")
+            logger.error(
+                f"Could not find local mmdetection configs at: {self._config_root}"
+            )
             raise FileNotFoundError(
                 f"Could not find local mmdetection configs at: {self._config_root}\n"
                 "Ensure you are running from the project root and 'mmdetection' is cloned there."
@@ -52,7 +56,9 @@ class ConfigLoader:
             )
 
         # Prefer short names (base configs) and 'coco'
-        best_match = sorted(matches, key=lambda p: (len(str(p)), "coco" not in str(p)))[0]
+        best_match = sorted(matches, key=lambda p: (len(str(p)), "coco" not in str(p)))[
+            0
+        ]
         logger.info(f"Best fuzzy match for '{model_name}' is: {best_match}")
         return best_match
 
@@ -63,12 +69,14 @@ class ConfigLoader:
             # Skip base configs and other non-model files
             if "_base_" in path.parts:
                 continue
-            
+
             logger.debug(f"Found config: {path.stem} -> {path}")
             self._config_map[path.stem] = path
 
         self._scanned = True
-        logger.info(f"Finished scanning. Found {len(self._config_map)} model config files.")
+        logger.info(
+            f"Finished scanning. Found {len(self._config_map)} model config files."
+        )
 
 
 # Global instance
@@ -77,5 +85,3 @@ _LOADER = ConfigLoader()
 
 def get_config_file(model_name: str) -> Path:
     return _LOADER.get_config_path(model_name)
-
-

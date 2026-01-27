@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
 from loguru import logger
 from mmdet.utils import register_all_modules
@@ -7,12 +7,12 @@ from mmengine.config import Config
 from mmengine.runner import Runner
 
 from ez_mmdetection.core.config_loader import get_config_file
-from ez_mmdetection.schemas.dataset import DatasetConfig # New import
+from ez_mmdetection.schemas.dataset import DatasetConfig  # New import
 from ez_mmdetection.utils.toml_config import (
-    UserConfig,
-    ModelSection, # Re-added
     DataSection,  # Re-added
+    ModelSection,  # Re-added
     TrainingSection,
+    UserConfig,
     save_user_config,
 )
 
@@ -60,16 +60,21 @@ class EZDetector:
         """
         logger.info(f"Loading dataset configuration from: {dataset_config_path}")
         dataset_cfg = DatasetConfig.from_toml(Path(dataset_config_path))
-        
         # Set internal state for num_classes and classes
         self.classes = dataset_cfg.classes
-        self.num_classes = len(dataset_cfg.classes) if dataset_cfg.classes else 80 # Default to 80 for COCO if not specified
+        self.num_classes = (
+            len(dataset_cfg.classes) if dataset_cfg.classes else 80
+        )  # Default to 80 for COCO if not specified
 
         # Ensure num_classes is set and valid
         if self.num_classes is None or self.num_classes <= 0:
-            raise ValueError("Dataset config must provide valid 'classes' or detector must be initialized with a 'num_classes'.")
+            raise ValueError(
+                "Dataset config must provide valid 'classes' or detector must be initialized with a 'num_classes'."
+            )
 
-        logger.info(f"Constructing UserConfig for training with dataset: '{dataset_config_path}'")
+        logger.info(
+            f"Constructing UserConfig for training with dataset: '{dataset_config_path}'"
+        )
         user_config = UserConfig(
             model=ModelSection(
                 name=self.model_name,
@@ -145,8 +150,10 @@ class EZDetector:
         self._cfg.load_from = model_cfg.load_from
 
         # Optimizer
-        if hasattr(self._cfg, "optim_wrapper") and hasattr(self._cfg.optim_wrapper, "optimizer"):
-             self._cfg.optim_wrapper.optimizer.lr = train_cfg.learning_rate
+        if hasattr(self._cfg, "optim_wrapper") and hasattr(
+            self._cfg.optim_wrapper, "optimizer"
+        ):
+            self._cfg.optim_wrapper.optimizer.lr = train_cfg.learning_rate
 
         # Data roots and paths
         self._cfg.data_root = data_cfg.root
@@ -158,20 +165,32 @@ class EZDetector:
                 # Set annotation and image paths
                 if key == "train_dataloader":
                     getattr(self._cfg, key).dataset.ann_file = data_cfg.train_ann
-                    getattr(self._cfg, key).dataset.data_prefix = {"img": data_cfg.train_img}
-                else: # val and test use the same settings
+                    getattr(self._cfg, key).dataset.data_prefix = {
+                        "img": data_cfg.train_img
+                    }
+                else:  # val and test use the same settings
                     getattr(self._cfg, key).dataset.ann_file = data_cfg.val_ann
-                    getattr(self._cfg, key).dataset.data_prefix = {"img": data_cfg.val_img}
+                    getattr(self._cfg, key).dataset.data_prefix = {
+                        "img": data_cfg.val_img
+                    }
 
         # Handle classes and num_classes consistently
         if data_cfg.classes:
             self._cfg.metainfo = {"classes": data_cfg.classes}
-            for key in ["train_dataloader", "val_dataloader", "test_dataloader"]:
+            for key in [
+                "train_dataloader",
+                "val_dataloader",
+                "test_dataloader",
+            ]:
                 if hasattr(self._cfg, key):
-                    getattr(self._cfg, key).dataset.metainfo = {"classes": data_cfg.classes}
+                    getattr(self._cfg, key).dataset.metainfo = {
+                        "classes": data_cfg.classes
+                    }
 
         # This is the most brittle part - needs a robust strategy
-        logger.info(f"  - Overriding 'model.bbox_head.num_classes': {model_cfg.num_classes}")
+        logger.info(
+            f"  - Overriding 'model.bbox_head.num_classes': {model_cfg.num_classes}"
+        )
         if hasattr(self._cfg.model, "bbox_head"):
             if isinstance(self._cfg.model.bbox_head, list):
                 for head in self._cfg.model.bbox_head:
@@ -180,5 +199,3 @@ class EZDetector:
                 self._cfg.model.bbox_head.num_classes = model_cfg.num_classes
 
         logger.info("Finished applying overrides.")
-
-
