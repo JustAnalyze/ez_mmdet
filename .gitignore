@@ -22,3 +22,6 @@ mmdetection/checkpoints/
 # Local directories
 runs/
 dummy_data/
+
+# todo
+todo.md
