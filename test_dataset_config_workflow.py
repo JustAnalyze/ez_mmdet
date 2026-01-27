@@ -10,18 +10,18 @@ project_root = Path(__file__).parent
 src_path = project_root / 'src'
 sys.path.insert(0, str(src_path))
 
-from ez_mmdetection.core.engine import EZDetector
+from ez_mmdetection import RTMDet
 from ez_mmdetection.schemas.dataset import DatasetConfig, SplitConfig
 
 def main():
     """
-    Demonstrates the new dataset-config based training workflow.
+    Demonstrates the new dataset-config based training workflow using the RTMDet concrete class.
     """
     logger.remove()
     logger.add(sys.stdout, level="INFO")
     logger.info("Loguru logger configured.")
 
-    logger.info("\n--- Demonstrating Dataset Config Workflow ---")
+    logger.info("\n--- Demonstrating Dataset Config Workflow with RTMDet ---")
 
     # Define a unique work_dir within the 'runs' folder
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -49,8 +49,8 @@ def main():
         logger.info(f"Created temporary dataset config at: {dataset_config_path}")
 
         try:
-            logger.info("1. Initializing EZDetector (no classes needed initially).")
-            detector = EZDetector(model_name="rtmdet_tiny")
+            logger.info("1. Initializing RTMDet.")
+            detector = RTMDet(model_name="rtmdet_tiny")
             
             logger.info(f"2. Calling train() with dataset_config_path. Output work_dir: {output_work_dir}")
             detector.train(
@@ -63,7 +63,7 @@ def main():
             )
 
         except Exception as e:
-            logger.info(f"Caught expected exception during training attempt: {e}")
+            logger.warning(f"Caught expected exception during training attempt: {e}")
             logger.info("This is expected as we are not running a full MMDetection environment.")
             logger.info("The goal is to verify that DatasetConfig was loaded and UserConfig constructed.")
 
