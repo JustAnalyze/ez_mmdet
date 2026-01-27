@@ -5,6 +5,7 @@ description = "A user-friendly API for MMDetection"
 readme = "README.md"
 requires-python = ">=3.9,<3.11"
 dependencies = [
+    "setuptools>=69.5.1",
     "mmengine>=0.10.7",
     "openmim>=0.3.9",
     "mmdet",
@@ -99,8 +100,8 @@ dev = [
     "ruff>=0.14.14",
 ]
 
-[tool.setuptools]
-packages = []
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.ruff]
 line-length = 88
