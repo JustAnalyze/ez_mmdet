@@ -50,6 +50,7 @@ class EZMMDetector(ABC):
         work_dir: str = "./runs/train",
         learning_rate: float = 0.001,
         load_from: Optional[str] = None,
+        log_level: str = "INFO",
     ) -> None:
         """The Template Method defining the training workflow.
 
@@ -61,6 +62,7 @@ class EZMMDetector(ABC):
             work_dir: Directory to save logs and checkpoints.
             learning_rate: Base learning rate.
             load_from: Path to a checkpoint to resume from or load weights.
+            log_level: Logging level (e.g., 'INFO', 'WARNING'). Default is 'INFO'.
         """
         logger.info(
             f"Loading dataset configuration from: {dataset_config_path}"
@@ -92,6 +94,7 @@ class EZMMDetector(ABC):
                 learning_rate=learning_rate,
                 device=device,
                 work_dir=work_dir,
+                log_level=log_level,
             ),
         )
 
@@ -141,6 +144,8 @@ class EZMMDetector(ABC):
             self._cfg.optim_wrapper.optimizer.lr = (
                 config.training.learning_rate
             )
+
+        self._cfg.log_level = config.training.log_level
 
         # Data roots and paths
         self._cfg.data_root = config.data.root

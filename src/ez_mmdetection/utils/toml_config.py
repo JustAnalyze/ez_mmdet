@@ -28,6 +28,7 @@ class TrainingSection(BaseModel):
     learning_rate: float = Field(0.001, gt=0.0)
     device: str = "cuda"
     work_dir: str = "./runs/train"
+    log_level: str = "INFO"
 
 
 class UserConfig(BaseModel):

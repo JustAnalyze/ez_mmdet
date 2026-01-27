@@ -20,6 +20,7 @@ mmdetection/checkpoints/
 *.pkl
 
 # Local directories
+output_test/
 runs/
 dummy_data/
 

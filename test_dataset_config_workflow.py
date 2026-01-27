@@ -52,7 +52,7 @@ def main():
             logger.info("1. Initializing RTMDet.")
             detector = RTMDet(model_name="rtmdet_tiny")
             
-            logger.info(f"2. Calling train() with dataset_config_path. Output work_dir: {output_work_dir}")
+            logger.info(f"2. Calling train() with log_level='WARNING'. Output work_dir: {output_work_dir}")
             detector.train(
                 dataset_config_path=dataset_config_path,
                 epochs=1,
@@ -60,12 +60,12 @@ def main():
                 device="cpu",
                 work_dir=str(output_work_dir),
                 learning_rate=0.0001,
+                log_level="WARNING",
             )
 
         except Exception as e:
             logger.warning(f"Caught expected exception during training attempt: {e}")
             logger.info("This is expected as we are not running a full MMDetection environment.")
-            logger.info("The goal is to verify that DatasetConfig was loaded and UserConfig constructed.")
 
     # Verify the generated user_config.toml exists
     saved_config_path = output_work_dir / "user_config.toml"
