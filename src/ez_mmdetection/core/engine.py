@@ -7,13 +7,13 @@ from mmengine.config import Config
 from mmengine.runner import Runner
 
 from ez_mmdetection.core.config_loader import get_config_file
+from ez_mmdetection.schemas.dataset import DatasetConfig # New import
 from ez_mmdetection.utils.toml_config import (
     UserConfig,
-    ModelSection,
-    DataSection,
+    ModelSection, # Re-added
+    DataSection,  # Re-added
     TrainingSection,
     save_user_config,
-    load_user_config,
 )
 
 # Force registration of MMDet modules
@@ -23,84 +23,78 @@ register_all_modules()
 class EZDetector:
     """Main interface for training and inference using MMDetection."""
 
-    def __init__(self, model_name: str = "rtmdet_tiny", num_classes: Optional[int] = None, classes: Optional[List[str]] = None):
+    def __init__(self, model_name: str = "rtmdet_tiny"):
         """Initializes the detector with a base model.
 
         Args:
             model_name: The name of the architecture (e.g., 'rtmdet_tiny').
-            num_classes: Number of classes in the dataset. If `classes` is provided, this is inferred.
-            classes: A list of class names for the dataset.
         """
-        if classes:
-            num_classes = len(classes)
-        elif num_classes is None:
-            raise ValueError("Either `num_classes` or `classes` must be provided.")
-
-        logger.info(f"Initializing EZDetector with model: '{model_name}', num_classes: {num_classes}")
+        logger.info(f"Initializing EZDetector with base model: '{model_name}'")
         self.model_name = model_name
-        self.num_classes = num_classes
-        self.classes = classes
+        # These will be populated from DatasetConfig
+        self.num_classes: Optional[int] = None
+        self.classes: Optional[List[str]] = None
         # Placeholder for the internal MMDet Config object
         self._cfg: Optional[Config] = None
 
     def train(
         self,
-        config_file: Optional[Union[str, Path]] = None,
-        data_root: Optional[Union[str, Path]] = None,
+        dataset_config_path: Union[str, Path],
         epochs: int = 100,
         batch_size: int = 8,
         device: str = "cuda",
         work_dir: str = "./runs/train",
-        train_ann: str = "annotations/instances_train2017.json",
-        train_img: str = "train2017/",
-        val_ann: str = "annotations/instances_val2017.json",
-        val_img: str = "val2017/",
         learning_rate: float = 0.001,
         load_from: Optional[str] = None,
     ) -> None:
-        """Launches the training process from a config file or parameters.
+        """Launches the training process using a dataset configuration file.
 
-        This method supports two workflows:
-        1.  **Config-file based:** Provide the `config_file` argument.
-            >>> detector.train(config_file="path/to/your/config.toml")
-
-        2.  **Parameter-based:** Provide `data_root` and other arguments. A
-            `user_config.toml` will be generated in your `work_dir`.
-            >>> detector.train(data_root="path/to/data", epochs=50)
+        Args:
+            dataset_config_path: Path to the `dataset.toml` file defining the dataset.
+            epochs: Total training epochs (default: 100).
+            batch_size: Batch size per device (default: 8).
+            device: Computing device (default: 'cuda').
+            work_dir: Directory for output files (default: './runs/train').
+            learning_rate: Initial learning rate (default: 0.001).
+            load_from: Optional path to a checkpoint to load from.
         """
-        if config_file:
-            logger.info(f"Loading training configuration from: {config_file}")
-            config = load_user_config(Path(config_file))
-        elif data_root:
-            logger.info("Constructing training configuration from parameters...")
-            config = UserConfig(
-                model=ModelSection(
-                    name=self.model_name,
-                    num_classes=self.num_classes,
-                    load_from=load_from,
-                ),
-                data=DataSection(
-                    root=str(data_root),
-                    train_ann=train_ann,
-                    train_img=train_img,
-                    val_ann=val_ann,
-                    val_img=val_img,
-                    classes=self.classes,
-                ),
-                training=TrainingSection(
-                    epochs=epochs,
-                    batch_size=batch_size,
-                    learning_rate=learning_rate,
-                    device=device,
-                    work_dir=work_dir,
-                ),
-            )
-        else:
-            raise ValueError(
-                "Either `config_file` or `data_root` must be provided to start training."
-            )
+        logger.info(f"Loading dataset configuration from: {dataset_config_path}")
+        dataset_cfg = DatasetConfig.from_toml(Path(dataset_config_path))
+        
+        # Set internal state for num_classes and classes
+        self.classes = dataset_cfg.classes
+        self.num_classes = len(dataset_cfg.classes) if dataset_cfg.classes else 80 # Default to 80 for COCO if not specified
 
-        self._train_from_config(config)
+        # Ensure num_classes is set and valid
+        if self.num_classes is None or self.num_classes <= 0:
+            raise ValueError("Dataset config must provide valid 'classes' or detector must be initialized with a 'num_classes'.")
+
+        logger.info(f"Constructing UserConfig for training with dataset: '{dataset_config_path}'")
+        user_config = UserConfig(
+            model=ModelSection(
+                name=self.model_name,
+                num_classes=self.num_classes,
+                load_from=load_from,
+            ),
+            data=DataSection(
+                root=str(dataset_cfg.data_root),
+                train_ann=dataset_cfg.train.ann_file,
+                train_img=dataset_cfg.train.img_dir,
+                val_ann=dataset_cfg.val.ann_file,
+                val_img=dataset_cfg.val.img_dir,
+                classes=self.classes,
+                # test=dataset_cfg.test, # Include test split if available. Note: DataSection currently doesn't support 'test' explicitly based on previous file content, need to check utils/toml_config.py
+            ),
+            training=TrainingSection(
+                epochs=epochs,
+                batch_size=batch_size,
+                learning_rate=learning_rate,
+                device=device,
+                work_dir=work_dir,
+            ),
+        )
+
+        self._train_from_config(user_config)
 
     def _train_from_config(self, config: UserConfig) -> None:
         """The core training logic, driven by a validated UserConfig."""
