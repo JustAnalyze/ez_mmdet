@@ -24,6 +24,7 @@ def train(
     ),
     device: str = typer.Option("cuda", help="Training device"),
     learning_rate: float = typer.Option(0.001, help="Initial learning rate"),
+    amp: bool = typer.Option(True, help="Enable Automatic Mixed Precision training"),
 ):
     """Starts model training using a dataset configuration."""
     detector = RTMDet(model_name=model_name)
@@ -34,6 +35,7 @@ def train(
         work_dir=work_dir,
         device=device,
         learning_rate=learning_rate,
+        amp=amp,
     )
 
 

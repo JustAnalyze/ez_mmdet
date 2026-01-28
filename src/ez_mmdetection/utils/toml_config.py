@@ -39,6 +39,7 @@ class TrainingSection(BaseModel):
     device: str = "cuda"
     work_dir: str = "./runs/train"
     log_level: str = "INFO"
+    amp: bool = True
 
 
 class UserConfig(BaseModel):

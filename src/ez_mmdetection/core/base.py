@@ -112,6 +112,7 @@ class EZMMDetector(ABC):
         learning_rate: float = 0.001,
         load_from: Optional[str] = None,
         log_level: Optional[str] = None,
+        amp: bool = True,
     ) -> None:
         """The Template Method defining the training workflow.
 
@@ -124,6 +125,7 @@ class EZMMDetector(ABC):
             learning_rate: Base learning rate.
             load_from: Optional checkpoint to resume from. Defaults to instance checkpoint.
             log_level: Logging level. Defaults to instance log_level.
+            amp: Whether to enable Automatic Mixed Precision training. Defaults to True.
         """
         target_log_level = log_level or self.log_level
         # Use provided load_from or the one from initialization
@@ -134,13 +136,11 @@ class EZMMDetector(ABC):
         )
         dataset_cfg = DatasetConfig.from_toml(Path(dataset_config_path))
         
-        # Populate internal state from dataset config
         self.classes = dataset_cfg.classes
         self.num_classes: int = (
             len(dataset_cfg.classes) if dataset_cfg.classes else 80
         )
         
-        # Construct the UserConfig artifact
         user_config = UserConfig(
             model=ModelSection(
                 name=self.model_name,
@@ -162,6 +162,7 @@ class EZMMDetector(ABC):
                 device=device,
                 work_dir=work_dir,
                 log_level=target_log_level,
+                amp=amp,
             ),
         )
 
@@ -205,12 +206,19 @@ class EZMMDetector(ABC):
         self._cfg.train_cfg.max_epochs = config.training.epochs
         self._cfg.load_from = config.model.load_from
 
-        if hasattr(self._cfg, "optim_wrapper") and hasattr(
-            self._cfg.optim_wrapper, "optimizer"
-        ):
-            self._cfg.optim_wrapper.optimizer.lr = (
-                config.training.learning_rate
-            )
+        if hasattr(self._cfg, "optim_wrapper"):
+            if config.training.amp:
+                self._cfg.optim_wrapper.type = 'AmpOptimWrapper'
+                self._cfg.optim_wrapper.loss_scale = 'dynamic'
+            else:
+                self._cfg.optim_wrapper.type = 'OptimWrapper'
+                if hasattr(self._cfg.optim_wrapper, 'loss_scale'):
+                    del self._cfg.optim_wrapper['loss_scale']
+
+            if hasattr(self._cfg.optim_wrapper, "optimizer"):
+                self._cfg.optim_wrapper.optimizer.lr = (
+                    config.training.learning_rate
+                )
 
         self._cfg.log_level = config.training.log_level
 
