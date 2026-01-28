@@ -19,12 +19,14 @@ def train(
     ),
     epochs: int = typer.Option(100, help="Number of training epochs"),
     batch_size: int = typer.Option(8, help="Batch size per GPU"),
+    num_workers: int = typer.Option(2, help="Number of dataloader workers"),
     work_dir: str = typer.Option(
         "./runs/train", help="Directory to save logs and checkpoints"
     ),
     device: str = typer.Option("cuda", help="Training device"),
     learning_rate: float = typer.Option(0.001, help="Initial learning rate"),
     amp: bool = typer.Option(True, help="Enable Automatic Mixed Precision training"),
+    tensorboard: bool = typer.Option(True, help="Enable TensorBoard logging"),
 ):
     """Starts model training using a dataset configuration."""
     detector = RTMDet(model_name=model_name)
@@ -32,10 +34,12 @@ def train(
         dataset_config_path=dataset_config_path,
         epochs=epochs,
         batch_size=batch_size,
+        num_workers=num_workers,
         work_dir=work_dir,
         device=device,
         learning_rate=learning_rate,
         amp=amp,
+        enable_tensorboard=tensorboard,
     )
 
 

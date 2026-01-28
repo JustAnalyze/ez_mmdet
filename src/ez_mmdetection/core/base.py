@@ -121,6 +121,8 @@ class EZMMDetector(ABC):
         load_from: Optional[str] = None,
         log_level: Optional[str] = None,
         amp: bool = True,
+        num_workers: int = 2,
+        enable_tensorboard: bool = True,
     ) -> None:
         """The Template Method defining the training workflow.
 
@@ -134,6 +136,8 @@ class EZMMDetector(ABC):
             load_from: Optional checkpoint to resume from. Defaults to instance checkpoint.
             log_level: Logging level. Defaults to instance log_level.
             amp: Whether to enable Automatic Mixed Precision training. Defaults to True.
+            num_workers: Number of dataloader workers. Defaults to 2.
+            enable_tensorboard: Whether to enable TensorBoard logging. Defaults to True.
         """
         target_log_level = log_level or self.log_level
         # Use provided load_from or the one from initialization
@@ -169,6 +173,8 @@ class EZMMDetector(ABC):
                 work_dir=work_dir,
                 log_level=target_log_level,
                 amp=amp,
+                num_workers=num_workers,
+                enable_tensorboard=enable_tensorboard,
             ),
         )
 
@@ -225,20 +231,24 @@ class EZMMDetector(ABC):
         self._cfg.log_level = config.training.log_level
 
         # Data roots and paths
-        self._cfg.data_root = config.data.root
+        data_root = Path(config.data.root)
+        self._cfg.data_root = str(data_root)
+        
         for key in ["train_dataloader", "val_dataloader", "test_dataloader"]:
             if hasattr(self._cfg, key):
                 dl = getattr(self._cfg, key)
-                dl.dataset.data_root = config.data.root
+                # Setting data_root to empty string to prevent double-joining
+                dl.dataset.data_root = ""
                 dl.batch_size = config.training.batch_size
+                dl.num_workers = config.training.num_workers
 
-                # Annotation files and image prefixes
+                # Use absolute paths for annotations and images
                 if key == "train_dataloader":
-                    dl.dataset.ann_file = config.data.train_ann
-                    dl.dataset.data_prefix = {"img": config.data.train_img}
+                    dl.dataset.ann_file = str(data_root / config.data.train_ann)
+                    dl.dataset.data_prefix = {"img": str(data_root / config.data.train_img)}
                 else:
-                    dl.dataset.ann_file = config.data.val_ann
-                    dl.dataset.data_prefix = {"img": config.data.val_img}
+                    dl.dataset.ann_file = str(data_root / config.data.val_ann)
+                    dl.dataset.data_prefix = {"img": str(data_root / config.data.val_img)}
 
                 if config.data.classes:
                     dl.dataset.metainfo = {"classes": config.data.classes}
@@ -247,14 +257,32 @@ class EZMMDetector(ABC):
         if config.data.classes:
             self._cfg.metainfo = {"classes": config.data.classes}
 
+        # Configure TensorBoard backend
+        if config.training.enable_tensorboard:
+            # Ensure visualizer exists and has vis_backends list
+            if not hasattr(self._cfg, 'visualizer'):
+                self._cfg.visualizer = dict(type='DetLocalVisualizer', vis_backends=[dict(type='LocalVisBackend')])
+            
+            if 'vis_backends' not in self._cfg.visualizer:
+                self._cfg.visualizer['vis_backends'] = [dict(type='LocalVisBackend')]
+            
+            # Check if TensorboardVisBackend is already there
+            has_tb = False
+            for backend in self._cfg.visualizer['vis_backends']:
+                if backend['type'] == 'TensorboardVisBackend':
+                    has_tb = True
+                    break
+            
+            if not has_tb:
+                self._cfg.visualizer['vis_backends'].append(dict(type='TensorboardVisBackend'))
+
         # Override Evaluators
+        # Evaluators often need absolute paths if data_root isn't explicitly used by them
         if hasattr(self._cfg, "val_evaluator"):
-            self._cfg.val_evaluator.ann_file = config.data.val_ann
+            self._cfg.val_evaluator.ann_file = str(data_root / config.data.val_ann)
         if hasattr(self._cfg, "test_evaluator"):
-            # Use test_ann if provided in DataSection (need to ensure it's there),
-            # otherwise fallback to val_ann which is common in MMDet configs
-            test_ann = getattr(config.data, "test_ann", config.data.val_ann)
-            self._cfg.test_evaluator.ann_file = test_ann
+            test_ann = config.data.test_ann or config.data.val_ann
+            self._cfg.test_evaluator.ann_file = str(data_root / test_ann)
 
     @abstractmethod
     def _configure_model_specifics(self, config: UserConfig) -> None:
@@ -264,4 +292,3 @@ class EZMMDetector(ABC):
 
 # TODO: Implement EZMMPose
 class EZMMPose: ...
-

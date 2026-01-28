@@ -37,10 +37,12 @@ class TrainingSection(BaseModel):
     
     epochs: int = Field(100, gt=0)
     batch_size: int = Field(8, gt=0)
+    num_workers: int = Field(2, ge=0, description="Number of dataloader workers")
     learning_rate: float = Field(0.001, gt=0.0)
     device: str = "cuda"
     work_dir: str = "./runs/train"
     log_level: str = "INFO"
+    enable_tensorboard: bool = Field(True, description="Enable TensorBoard logging")
     amp: bool = True
 
 
