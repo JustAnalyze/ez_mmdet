@@ -1,21 +1,32 @@
-import typer
 from pathlib import Path
 from typing import Optional
+
+import typer
+
 from ez_mmdetection import RTMDet
+from ez_mmdetection.schemas.model import ModelName # New import
 
 app = typer.Typer(help="ez_mmdet: A user-friendly CLI for MMDetection")
 
+
 @app.command()
 def train(
-    dataset_config_path: Path = typer.Argument(..., help="Path to the dataset.toml file"),
+    model_name: ModelName = typer.Argument(
+        ..., help="Name of the model architecture"
+    ),
+    dataset_config_path: Path = typer.Argument(
+        ..., help="Path to the dataset.toml file"
+    ),
     epochs: int = typer.Option(100, help="Number of training epochs"),
     batch_size: int = typer.Option(8, help="Batch size per GPU"),
-    work_dir: str = typer.Option("./runs/train", help="Directory to save logs and checkpoints"),
+    work_dir: str = typer.Option(
+        "./runs/train", help="Directory to save logs and checkpoints"
+    ),
     device: str = typer.Option("cuda", help="Training device"),
     learning_rate: float = typer.Option(0.001, help="Initial learning rate"),
 ):
     """Starts model training using a dataset configuration."""
-    detector = RTMDet()
+    detector = RTMDet(model_name=model_name)
     detector.train(
         dataset_config_path=dataset_config_path,
         epochs=epochs,
@@ -25,12 +36,21 @@ def train(
         learning_rate=learning_rate,
     )
 
+
 @app.command()
 def predict(
-    model_name: str = typer.Argument(..., help="Name of the model architecture"),
-    checkpoint_path: Path = typer.Argument(..., help="Path to the model checkpoint"),
-    image_path: Path = typer.Argument(..., help="Path to the image for inference"),
-    out_dir: Optional[str] = typer.Option(None, help="Directory to save visualization results"),
+    model_name: ModelName = typer.Argument(
+        ..., help="Name of the model architecture"
+    ),
+    checkpoint_path: Path = typer.Argument(
+        ..., help="Path to the model checkpoint"
+    ),
+    image_path: Path = typer.Argument(
+        ..., help="Path to the image for inference"
+    ),
+    out_dir: Optional[str] = typer.Option(
+        "runs/preds", help="Directory to save visualization results"
+    ),
     device: str = typer.Option("cpu", help="Computing device"),
 ):
     """Performs object detection on an image."""
@@ -41,6 +61,7 @@ def predict(
         out_dir=out_dir,
         device=device,
     )
+
 
 if __name__ == "__main__":
     app()

@@ -33,11 +33,14 @@ def test_predict_initializes_inferencer_and_calls_it():
         # Verify DetInferencer was initialized correctly
         mock_inferencer_cls.assert_called_once()
         _, kwargs = mock_inferencer_cls.call_args
-        assert kwargs["model"] == model_name
+        
+        # We expect the full path here now
+        expected_config = str(Path.cwd() / "libs/mmdetection/configs/rtmdet/rtmdet_tiny_8xb32-300e_coco.py")
+        assert kwargs["model"] == expected_config
         assert kwargs["weights"] == checkpoint_path
         
         # Verify inferencer was called with the image
-        mock_inferencer_instance.assert_called_once_with(str(image_path), out_dir=None, show=False)
+        mock_inferencer_instance.assert_called_once_with(str(image_path), out_dir="", show=False)
         
         # Verify results is an InferenceResult object
         assert isinstance(results, InferenceResult)

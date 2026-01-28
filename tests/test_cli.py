@@ -11,9 +11,16 @@ def test_cli_help():
     assert result.exit_code == 0
     assert "Usage:" in result.stdout
 
+def test_train_command_requires_model_name():
+    """Test that the train command fails if model_name is missing."""
+    result = runner.invoke(app, ["train"])
+    assert result.exit_code != 0
+    assert "Missing argument" in result.output
+    assert "model_name" in result.output.lower()
+
 def test_train_command_requires_dataset_config():
     """Test that the train command fails if dataset_config_path is missing."""
-    result = runner.invoke(app, ["train"])
+    result = runner.invoke(app, ["train", "rtmdet_tiny"])
     assert result.exit_code != 0
     assert "Missing argument 'DATASET_CONFIG_PATH'" in result.output
 

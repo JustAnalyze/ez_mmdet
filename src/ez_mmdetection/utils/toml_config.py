@@ -6,14 +6,22 @@ import tomli_w
 from pydantic import BaseModel, Field
 
 
+from ez_mmdetection.schemas.model import ModelName
+
+from pydantic import BaseModel, Field, ConfigDict
+
 # --- Pydantic Models for Validation ---
 class ModelSection(BaseModel):
-    name: str = "rtmdet_tiny"
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
+    name: ModelName = ModelName.RTM_DET_TINY
     num_classes: int = Field(..., gt=0)
     load_from: Optional[str] = None
 
 
 class DataSection(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
     root: str
     train_ann: str = "annotations/instances_train2017.json"
     train_img: str = "train2017/"
@@ -23,6 +31,8 @@ class DataSection(BaseModel):
 
 
 class TrainingSection(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
     epochs: int = Field(100, gt=0)
     batch_size: int = Field(8, gt=0)
     learning_rate: float = Field(0.001, gt=0.0)
@@ -33,6 +43,7 @@ class TrainingSection(BaseModel):
 
 class UserConfig(BaseModel):
     """The master schema for config.toml."""
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     model: ModelSection
     data: DataSection

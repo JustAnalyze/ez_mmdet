@@ -1,16 +1,18 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 from loguru import logger
-from mmdet.apis import DetInferencer # New import
+from mmdet.apis import DetInferencer
 from mmdet.utils import register_all_modules
 from mmengine.config import Config
 from mmengine.runner import Runner
 
 from ez_mmdetection.core.config_loader import get_config_file
 from ez_mmdetection.schemas.dataset import DatasetConfig
-from ez_mmdetection.schemas.inference import InferenceResult # New import
+from ez_mmdetection.schemas.inference import InferenceResult
+from ez_mmdetection.schemas.model import ModelName
+from ez_mmdetection.utils.download import ensure_model_checkpoint
 from ez_mmdetection.utils.toml_config import (
     DataSection,
     ModelSection,
@@ -29,24 +31,38 @@ class EZMMDetector(ABC):
     Implements the Template Method Pattern for the training workflow.
     """
 
-    def __init__(self, model_name: str):
+    def __init__(self, model_name: ModelName, checkpoint_path: Optional[Union[str, Path]] = None, log_level: str = "INFO"):
         """Initializes the detector with a base model.
 
         Args:
             model_name: The name of the architecture (e.g., 'rtmdet_tiny').
+            checkpoint_path: Path to a specific checkpoint (.pth or .pt).
+            log_level: Global logging level. Default is 'INFO'.
         """
         logger.info(
             f"Initializing {self.__class__.__name__} with base model: '{model_name}'"
         )
-        self.model_name: str = model_name
+        self.model_name: str = model_name.value if isinstance(model_name, ModelName) else model_name
+        self.log_level: str = log_level
         self._cfg: Optional[Config] = None
         self._inferencer: Optional[DetInferencer] = None
+
+        # Resolve or download checkpoint
+        self.checkpoint_path = ensure_model_checkpoint(self.model_name, checkpoint_path)
+
+        # Configure loguru level
+        try:
+            logger.remove()
+            import sys
+            logger.add(sys.stderr, level=log_level)
+        except Exception as e:
+            logger.warning(f"Failed to set log level: {e}")
 
     def predict(
         self,
         image_path: Union[str, Path],
-        checkpoint_path: Union[str, Path],
-        device: str = "cpu",
+        checkpoint_path: Optional[Union[str, Path]] = None,
+        device: str = "cuda",
         out_dir: Optional[str] = None,
         show: bool = False,
     ) -> InferenceResult:
@@ -54,22 +70,36 @@ class EZMMDetector(ABC):
 
         Args:
             image_path: Path to the image file.
-            checkpoint_path: Path to the model checkpoint (.pth).
-            device: Computing device (default: 'cpu').
+            checkpoint_path: Optional override for the model checkpoint (.pth).
+            device: Computing device (default: 'cuda').
             out_dir: Directory to save visualization results.
             show: Whether to display the image.
 
         Returns:
             A structured InferenceResult object.
         """
+        # Prioritize method-level checkpoint, then instance-level
+        target_checkpoint = self.checkpoint_path
+        if checkpoint_path:
+            target_checkpoint = ensure_model_checkpoint(self.model_name, checkpoint_path)
+
         if self._inferencer is None:
-            logger.info(f"Initializing inferencer for model: {self.model_name}")
+            # Resolve model name to config file path
+            config_path = get_config_file(self.model_name)
+            logger.info(
+                f"Initializing inferencer for model: {self.model_name} (using config: {config_path})"
+            )
             self._inferencer = DetInferencer(
-                model=self.model_name, weights=str(checkpoint_path), device=device
+                model=str(config_path),
+                weights=str(target_checkpoint),
+                device=device,
             )
 
         logger.info(f"Running inference on: {image_path}")
-        results = self._inferencer(str(image_path), out_dir=out_dir, show=show)
+        # Ensure out_dir is not None, as DetInferencer expects a string or PathLike
+        results = self._inferencer(
+            str(image_path), out_dir=out_dir or "", show=show
+        )
         return InferenceResult.from_mmdet(results)
 
     def train(
@@ -81,7 +111,7 @@ class EZMMDetector(ABC):
         work_dir: str = "./runs/train",
         learning_rate: float = 0.001,
         load_from: Optional[str] = None,
-        log_level: str = "INFO",
+        log_level: Optional[str] = None,
     ) -> None:
         """The Template Method defining the training workflow.
 
@@ -92,24 +122,30 @@ class EZMMDetector(ABC):
             device: Training device ('cuda' or 'cpu').
             work_dir: Directory to save logs and checkpoints.
             learning_rate: Base learning rate.
-            load_from: Path to a checkpoint to resume from or load weights.
-            log_level: Logging level (e.g., 'INFO', 'WARNING'). Default is 'INFO'.
+            load_from: Optional checkpoint to resume from. Defaults to instance checkpoint.
+            log_level: Logging level. Defaults to instance log_level.
         """
+        target_log_level = log_level or self.log_level
+        # Use provided load_from or the one from initialization
+        final_load_from = load_from or str(self.checkpoint_path)
+        
         logger.info(
             f"Loading dataset configuration from: {dataset_config_path}"
         )
         dataset_cfg = DatasetConfig.from_toml(Path(dataset_config_path))
+        
         # Populate internal state from dataset config
         self.classes = dataset_cfg.classes
         self.num_classes: int = (
             len(dataset_cfg.classes) if dataset_cfg.classes else 80
         )
+        
         # Construct the UserConfig artifact
         user_config = UserConfig(
             model=ModelSection(
                 name=self.model_name,
                 num_classes=self.num_classes,
-                load_from=load_from,
+                load_from=final_load_from,
             ),
             data=DataSection(
                 root=str(dataset_cfg.data_root),
@@ -125,7 +161,7 @@ class EZMMDetector(ABC):
                 learning_rate=learning_rate,
                 device=device,
                 work_dir=work_dir,
-                log_level=log_level,
+                log_level=target_log_level,
             ),
         )
 
