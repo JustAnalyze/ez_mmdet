@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Optional, Union, List
+from typing import Optional, Union
 
 from loguru import logger
 from mmdet.apis import DetInferencer
@@ -31,7 +31,12 @@ class EZMMDetector(ABC):
     Implements the Template Method Pattern for the training workflow.
     """
 
-    def __init__(self, model_name: ModelName, checkpoint_path: Optional[Union[str, Path]] = None, log_level: str = "INFO"):
+    def __init__(
+        self,
+        model_name: ModelName,
+        checkpoint_path: Optional[Union[str, Path]] = None,
+        log_level: str = "INFO",
+    ):
         """Initializes the detector with a base model.
 
         Args:
@@ -42,7 +47,9 @@ class EZMMDetector(ABC):
         logger.info(
             f"Initializing {self.__class__.__name__} with base model: '{model_name}'"
         )
-        self.model_name: str = model_name.value if isinstance(model_name, ModelName) else model_name
+        self.model_name: str = (
+            model_name.value if isinstance(model_name, ModelName) else model_name
+        )
         self.log_level: str = log_level
         self._cfg: Optional[Config] = None
         self._inferencer: Optional[DetInferencer] = None
@@ -54,6 +61,7 @@ class EZMMDetector(ABC):
         try:
             logger.remove()
             import sys
+
             logger.add(sys.stderr, level=log_level)
         except Exception as e:
             logger.warning(f"Failed to set log level: {e}")
@@ -81,7 +89,9 @@ class EZMMDetector(ABC):
         # Prioritize method-level checkpoint, then instance-level
         target_checkpoint = self.checkpoint_path
         if checkpoint_path:
-            target_checkpoint = ensure_model_checkpoint(self.model_name, checkpoint_path)
+            target_checkpoint = ensure_model_checkpoint(
+                self.model_name, checkpoint_path
+            )
 
         if self._inferencer is None:
             # Resolve model name to config file path
@@ -97,9 +107,7 @@ class EZMMDetector(ABC):
 
         logger.info(f"Running inference on: {image_path}")
         # Ensure out_dir is not None, as DetInferencer expects a string or PathLike
-        results = self._inferencer(
-            str(image_path), out_dir=out_dir or "", show=show
-        )
+        results = self._inferencer(str(image_path), out_dir=out_dir or "", show=show)
         return InferenceResult.from_mmdet(results)
 
     def train(
@@ -130,17 +138,13 @@ class EZMMDetector(ABC):
         target_log_level = log_level or self.log_level
         # Use provided load_from or the one from initialization
         final_load_from = load_from or str(self.checkpoint_path)
-        
-        logger.info(
-            f"Loading dataset configuration from: {dataset_config_path}"
-        )
+
+        logger.info(f"Loading dataset configuration from: {dataset_config_path}")
         dataset_cfg = DatasetConfig.from_toml(Path(dataset_config_path))
-        
+
         self.classes = dataset_cfg.classes
-        self.num_classes: int = (
-            len(dataset_cfg.classes) if dataset_cfg.classes else 80
-        )
-        
+        self.num_classes: int = len(dataset_cfg.classes) if dataset_cfg.classes else 80
+
         user_config = UserConfig(
             model=ModelSection(
                 name=self.model_name,
@@ -153,6 +157,8 @@ class EZMMDetector(ABC):
                 train_img=dataset_cfg.train.img_dir,
                 val_ann=dataset_cfg.val.ann_file,
                 val_img=dataset_cfg.val.img_dir,
+                test_ann=dataset_cfg.test.ann_file if dataset_cfg.test else None,
+                test_img=dataset_cfg.test.img_dir if dataset_cfg.test else None,
                 classes=self.classes,
             ),
             training=TrainingSection(
@@ -174,9 +180,7 @@ class EZMMDetector(ABC):
         work_dir = Path(config.training.work_dir)
         work_dir.mkdir(parents=True, exist_ok=True)
         save_user_config(config, work_dir / "user_config.toml")
-        logger.info(
-            f"User configuration saved to: {work_dir / 'user_config.toml'}"
-        )
+        logger.info(f"User configuration saved to: {work_dir / 'user_config.toml'}")
 
         # 2. Load and Apply Overrides
         self._cfg = self._load_base_config(config.model.name)
@@ -208,17 +212,15 @@ class EZMMDetector(ABC):
 
         if hasattr(self._cfg, "optim_wrapper"):
             if config.training.amp:
-                self._cfg.optim_wrapper.type = 'AmpOptimWrapper'
-                self._cfg.optim_wrapper.loss_scale = 'dynamic'
+                self._cfg.optim_wrapper.type = "AmpOptimWrapper"
+                self._cfg.optim_wrapper.loss_scale = "dynamic"
             else:
-                self._cfg.optim_wrapper.type = 'OptimWrapper'
-                if hasattr(self._cfg.optim_wrapper, 'loss_scale'):
-                    del self._cfg.optim_wrapper['loss_scale']
+                self._cfg.optim_wrapper.type = "OptimWrapper"
+                if hasattr(self._cfg.optim_wrapper, "loss_scale"):
+                    del self._cfg.optim_wrapper["loss_scale"]
 
             if hasattr(self._cfg.optim_wrapper, "optimizer"):
-                self._cfg.optim_wrapper.optimizer.lr = (
-                    config.training.learning_rate
-                )
+                self._cfg.optim_wrapper.optimizer.lr = config.training.learning_rate
 
         self._cfg.log_level = config.training.log_level
 
@@ -245,7 +247,21 @@ class EZMMDetector(ABC):
         if config.data.classes:
             self._cfg.metainfo = {"classes": config.data.classes}
 
+        # Override Evaluators
+        if hasattr(self._cfg, "val_evaluator"):
+            self._cfg.val_evaluator.ann_file = config.data.val_ann
+        if hasattr(self._cfg, "test_evaluator"):
+            # Use test_ann if provided in DataSection (need to ensure it's there),
+            # otherwise fallback to val_ann which is common in MMDet configs
+            test_ann = getattr(config.data, "test_ann", config.data.val_ann)
+            self._cfg.test_evaluator.ann_file = test_ann
+
     @abstractmethod
     def _configure_model_specifics(self, config: UserConfig) -> None:
         """Subclasses must implement this to handle architecture-specific overrides."""
         pass
+
+
+# TODO: Implement EZMMPose
+class EZMMPose: ...
+

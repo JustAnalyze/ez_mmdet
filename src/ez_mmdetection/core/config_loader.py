@@ -4,6 +4,7 @@ from typing import Dict
 from loguru import logger
 
 
+# TODO: WE CAN GIVE THE CONFIG LOADER THE LIST OF AVAILABLE CONFIGS AND THEIR PATHS SO THAT WE DONT NEED TO DO A FUZZY SEARCH
 class ConfigLoader:
     """Finds MMDetection config files within the local frozen mmdetection repo."""
 

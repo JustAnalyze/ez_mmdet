@@ -27,6 +27,8 @@ class DataSection(BaseModel):
     train_img: str = "train2017/"
     val_ann: str = "annotations/instances_val2017.json"
     val_img: str = "val2017/"
+    test_ann: Optional[str] = None
+    test_img: Optional[str] = None
     classes: Optional[List[str]] = None
 
 
