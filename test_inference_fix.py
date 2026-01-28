@@ -1,7 +1,7 @@
 from ez_mmdetection import RTMDet
 
 # Initialize with WARNING log level to suppress INFO messages
-model = RTMDet("rtmdet_s", log_level="WARNING")
+model = RTMDet("rtmdet_m", log_level="WARNING")
 
 # Note: This will only work if the checkpoint file actually exists at the specified path.
 # For testing the fix, we are mainly looking at whether it resolves the config file
@@ -10,7 +10,6 @@ try:
     print("Starting prediction test (INFO logs should be suppressed)...")
     model.predict(
         image_path="libs/mmdetection/demo/large_image.jpg",
-        show=True,
         device="cpu",
         out_dir="runs/pred_outputs",
     )

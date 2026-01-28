@@ -21,82 +21,98 @@ dependencies = [
     "requests>=2.32.5",
 ]
 
-[project.optional-dependencies]
-cpu = [
-    "torch==1.13.1+cpu",
-    "torchvision==0.14.1+cpu",
-    # Logic: Linux expects +cpu, Windows expects standard 0.13.1
-    "torchaudio==0.13.1+cpu; sys_platform == 'linux'",
-    "torchaudio==0.13.1; sys_platform == 'win32'",
-    "mmcv==2.1.0",
-]
-gpu = [
-    "torch==1.13.1+cu117",
-    "torchvision==0.14.1+cu117",
-    "torchaudio==0.13.1",
-    "mmcv>=2.0.0rc4, <2.2.0",
-]
-
 [project.scripts]
 ez-mmdet = "ez_mmdetection.cli:app"
 
+# --- OPTIONAL DEPENDENCIES (The Switch) ---
+[project.optional-dependencies]
+cpu = [
+    "torch==2.0.1",
+    "torchvision==0.15.2",
+    "torchaudio==2.0.2",
+    "mmcv==2.1.0",
+]
+gpu = [
+    "torch==2.0.1",
+    "torchvision==0.15.2",
+    "torchaudio==2.0.2",
+    "mmcv==2.1.0",
+]
+
+# --- UV CONFIGURATION ---
 [tool.uv]
 managed = true
 package = true
-# Restrict resolution to Windows and Linux only
 environments = [
     "sys_platform == 'win32'",
     "sys_platform == 'linux'"
 ]
 no-build-isolation-package = ["mmdet"]
 
+# Declare conflicts between cpu and gpu extras
+conflicts = [
+    [
+        { extra = "cpu" },
+        { extra = "gpu" },
+    ],
+]
+
+# 2. INDEXES (For PyTorch)
 [[tool.uv.index]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
 [[tool.uv.index]]
-name = "pytorch-cu117"
+name = "pytorch-gpu"
 url = "https://download.pytorch.org/whl/cu117"
 explicit = true
 
+# 3. FLAT INDEXES (For MMCV) - HTML pages with wheel links
 [[tool.uv.index]]
 name = "mmcv-cpu"
-url = "https://download.openmmlab.com/mmcv/dist/cpu/torch1.13/index.html"
+url = "https://download.openmmlab.com/mmcv/dist/cpu/torch2.0/index.html"
+format = "flat"
 explicit = true
 
+[[tool.uv.index]]
+name = "mmcv-gpu"
+url = "https://download.openmmlab.com/mmcv/dist/cu117/torch2.0/index.html"
+format = "flat"
+explicit = true
+
+# 4. SOURCES - Map packages to indexes based on extra
 [tool.uv.sources]
 mmdetection = { path = "./libs/mmdetection", editable = true }
 
-# CPU: Point directly to the specific wheel file on the OpenMMLab server
-mmcv = [
-  # Wheel for Python 3.10
-  { url = "https://download.openmmlab.com/mmcv/dist/cpu/torch1.13.0/mmcv-2.1.0-cp310-cp310-manylinux1_x86_64.whl", marker = "extra == 'cpu' and python_version == '3.10'" },
-  # Wheel for Python 3.9
-  { url = "https://download.openmmlab.com/mmcv/dist/cpu/torch1.13.0/mmcv-2.1.0-cp39-cp39-manylinux1_x86_64.whl", marker = "extra == 'cpu' and python_version == '3.9'" }
-]
-
-# Map torch/vision/audio to the correct custom indexes
+# Map PyTorch packages to CPU or GPU index
 torch = [
-  { index = "pytorch-cpu", marker = "extra == 'cpu'" },
-  { index = "pytorch-cu117", marker = "extra == 'gpu' and extra != 'cpu'" }
+    { index = "pytorch-gpu", extra = "gpu" },
+    { index = "pytorch-cpu", extra = "cpu" }, 
 ]
 torchvision = [
-  { index = "pytorch-cpu", marker = "extra == 'cpu'" },
-  { index = "pytorch-cu117", marker = "extra == 'gpu' and extra != 'cpu'" }
+    { index = "pytorch-gpu", extra = "gpu" },
+    { index = "pytorch-cpu", extra = "cpu" },
 ]
 torchaudio = [
-  { index = "pytorch-cpu", marker = "extra == 'cpu'" },
-  { index = "pytorch-cu117", marker = "extra == 'gpu' and extra != 'cpu'" }
+    { index = "pytorch-gpu", extra = "gpu" },
+    { index = "pytorch-cpu", extra = "cpu" },
+]
+
+# Map MMCV to CPU or GPU flat index
+mmcv = [
+    { index = "mmcv-gpu", extra = "gpu" },
+    { index = "mmcv-cpu", extra = "cpu" },
 ]
 
 [tool.uv.extra-build-dependencies]
-mmdet = ["setuptools==69.5.1", "wheel", "torch==1.13.1+cpu"]
+mmdet = ["setuptools==69.5.1", "wheel"]
 
 [build-system]
 requires = ["setuptools>=69.5.1", "wheel"]
 build-backend = "setuptools.build_meta"
 
+# --- DEV TOOLS ---
 [dependency-groups]
 dev = [
     "mypy>=1.19.1",
@@ -114,15 +130,15 @@ indent-width = 4
 target-version = "py39"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "N", "W", "D"] # D for Docstrings
-ignore = ["D100", "D104"] # Ignore missing docstring in public module/package
+select = ["E", "F", "I", "N", "W", "D"]
+ignore = ["D100", "D104"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
 [tool.mypy]
 strict = true
-ignore_missing_imports = true # Often needed for MMDet internals
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 minversion = "6.0"
