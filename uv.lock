@@ -282,6 +282,8 @@ dependencies = [
     { name = "loguru", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
     { name = "mmdet", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
     { name = "mmengine", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+    { name = "numpy", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+    { name = "opencv-python-headless", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
     { name = "openmim", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
     { name = "pycocotools", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
     { name = "pydantic", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
@@ -321,6 +323,8 @@ requires-dist = [
     { name = "mmcv", marker = "python_full_version == '3.10.*' and extra == 'cpu' and extra == 'gpu'", url = "https://download.openmmlab.com/mmcv/dist/cpu/torch1.13.0/mmcv-2.1.0-cp310-cp310-manylinux1_x86_64.whl" },
     { name = "mmdet" },
     { name = "mmengine", specifier = ">=0.10.7" },
+    { name = "numpy", specifier = "==1.23.5" },
+    { name = "opencv-python-headless", specifier = "==4.8.0.76" },
     { name = "openmim", specifier = ">=0.3.9" },
     { name = "pycocotools", specifier = ">=2.0.7" },
     { name = "pydantic", specifier = ">=2.0.0" },
@@ -968,6 +972,21 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/2c/8b/90eb44a40476fa0e71e05a0283947cfd74a5d36121a11d926ad6f3193cc4/opencv_python-4.11.0.86-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6b02611523803495003bd87362db3e1d2a0454a6a63025dc6658a9830570aa0d", size = 62986597, upload-time = "2025-01-16T13:52:08.836Z" },
     { url = "https://files.pythonhosted.org/packages/fb/d7/1d5941a9dde095468b288d989ff6539dd69cd429dbf1b9e839013d21b6f0/opencv_python-4.11.0.86-cp37-abi3-win32.whl", hash = "sha256:810549cb2a4aedaa84ad9a1c92fbfdfc14090e2749cedf2c1589ad8359aa169b", size = 29384337, upload-time = "2025-01-16T13:52:13.549Z" },
     { url = "https://files.pythonhosted.org/packages/a4/7d/f1c30a92854540bf789e9cd5dde7ef49bbe63f855b85a2e6b3db8135c591/opencv_python-4.11.0.86-cp37-abi3-win_amd64.whl", hash = "sha256:085ad9b77c18853ea66283e98affefe2de8cc4c1f43eda4c100cf9b2721142ec", size = 39488044, upload-time = "2025-01-16T13:52:21.928Z" },
+]
+
+[[package]]
+name = "opencv-python-headless"
+version = "4.8.0.76"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fc/17/dd1333dda538f18b2a130477769d0e7f1c068e0428cb08bfc3f2b60fad5e/opencv-python-headless-4.8.0.76.tar.gz", hash = "sha256:bc15726187dae26d8a08777faf6bc71d38f20c785c102677f58ba0e935003afb", size = 92092531, upload-time = "2023-08-09T12:44:18.176Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/10/fb/540cd99f9ccf7c55ebcf23246402c7ffc69806267669b895da1a384a1bbf/opencv_python_headless-4.8.0.76-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c675b8dec6298ba6a1eec2ce24077a393b4236a043f68dfacb06bf594354ce06", size = 28686250, upload-time = "2023-08-09T18:48:19.972Z" },
+    { url = "https://files.pythonhosted.org/packages/21/6d/abf701fa71ff22e3617ec9b46197f9ff5bba16dfefa7ee259b60216112eb/opencv_python_headless-4.8.0.76-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:220d2e292fa45ef0582aab730460bbc15cfe61f2089208167a372ccf76f01e21", size = 49097090, upload-time = "2023-08-09T12:44:13.4Z" },
+    { url = "https://files.pythonhosted.org/packages/c8/9d/c2bb7109b70630c7c15a97310f2fded0d7d323369f141c92e346874e6363/opencv_python_headless-4.8.0.76-cp37-abi3-win32.whl", hash = "sha256:df0608de207ae9b094ad9eaf1a475cf6e9a069fb12cd289d4a18cefdab2f8aa8", size = 28197315, upload-time = "2023-08-09T12:42:44.156Z" },
+    { url = "https://files.pythonhosted.org/packages/70/78/7a13730745684584db53e8aa3c3bd84beef2dcb32bebf627bda0d6df461e/opencv_python_headless-4.8.0.76-cp37-abi3-win_amd64.whl", hash = "sha256:9c094faf6ec7bd360244647b26ebdf8f54edec1d9292cb9179fff9badcca7be8", size = 37954832, upload-time = "2023-08-09T12:42:48.038Z" },
 ]
 
 [[package]]
