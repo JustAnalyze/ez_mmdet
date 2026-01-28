@@ -1,6 +1,7 @@
 import typer
 from pathlib import Path
 from typing import Optional
+from ez_mmdetection import RTMDet
 
 app = typer.Typer(help="ez_mmdet: A user-friendly CLI for MMDetection")
 
@@ -11,9 +12,18 @@ def train(
     batch_size: int = typer.Option(8, help="Batch size per GPU"),
     work_dir: str = typer.Option("./runs/train", help="Directory to save logs and checkpoints"),
     device: str = typer.Option("cuda", help="Training device"),
+    learning_rate: float = typer.Option(0.001, help="Initial learning rate"),
 ):
     """Starts model training using a dataset configuration."""
-    typer.echo(f"Training with {dataset_config_path}")
+    detector = RTMDet()
+    detector.train(
+        dataset_config_path=dataset_config_path,
+        epochs=epochs,
+        batch_size=batch_size,
+        work_dir=work_dir,
+        device=device,
+        learning_rate=learning_rate,
+    )
 
 @app.command()
 def predict(

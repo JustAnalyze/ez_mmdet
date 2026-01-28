@@ -15,9 +15,9 @@
 - [x] Task: Scaffold `ez-mmdet` CLI with Typer
     - [x] Write tests for CLI argument parsing and error handling
     - [x] Create `src/ez_mmdetection/cli.py` and define the main entry point
-- [ ] Task: Implement `train` command
-    - [ ] Write integration tests for the `train` command (mocking the training loop)
-    - [ ] Implement `train` command logic, bridging CLI args to `EZDetector.train()`
+- [x] Task: Implement `train` command
+    - [x] Write integration tests for the `train` command (mocking the training loop)
+    - [x] Implement `train` command logic, bridging CLI args to `EZDetector.train()`
 - [ ] Task: Implement `predict` command
     - [ ] Write integration tests for the `predict` command
     - [ ] Implement `predict` command logic, bridging CLI args to `EZDetector.predict()`
