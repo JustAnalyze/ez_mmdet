@@ -18,6 +18,7 @@ dependencies = [
     "tomli>=2.4.0",
     "numpy==1.23.5",
     "opencv-python-headless==4.8.0.76",
+    "requests>=2.32.5",
 ]
 
 [project.optional-dependencies]

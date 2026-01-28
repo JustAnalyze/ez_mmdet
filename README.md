@@ -30,6 +30,7 @@ uv sync --extra cpu --preview
 ## 📖 Quick Start
 
 ### 1. Define your Data (`dataset.toml`)
+
 Create a file to describe your dataset structure. No more editing framework internals.
 
 ```toml
@@ -46,7 +47,9 @@ img_dir = "images/val"
 ```
 
 ### 2. Train a Model
+
 #### Using Python
+
 ```python
 from ez_mmdetection import RTMDet
 
@@ -63,11 +66,13 @@ detector.train(
 ```
 
 #### Using the CLI
+
 ```bash
 ez-mmdet train rtmdet_tiny dataset.toml --epochs 50 --batch-size 8
 ```
 
 ### 3. Run Inference
+
 `ez_mmdet` automatically manages your checkpoints. If you don't provide a path, it downloads the best official model for you.
 
 ```python
@@ -92,8 +97,6 @@ We are building `ez_mmdet` to be the easiest entry point into the OpenMMLab ecos
 - [ ] **Deployment Support:** Native `export` method to convert your trained `.pth` models to **ONNX** and TensorRT formats for production.
 - [ ] **Architecture Expansion:** Beyond RTMDet, we plan to bring the "EZ" treatment to **YOLOv8**, **Faster R-CNN**, and **DINO**.
 - [ ] **MMPose Integration:** Supporting human pose estimation via a similar `EZPose` API.
-- [ ] **Batch Inference:** High-performance prediction for large-scale datasets.
-- [ ] **Cloud Integration:** One-click training on AWS/GCP via `uv`.
 
 ---
 
@@ -102,5 +105,6 @@ We are building `ez_mmdet` to be the easiest entry point into the OpenMMLab ecos
 This project is in its early stages (MVP). We value your feedback! If you find a bug or have a feature request, please open an issue.
 
 **Current Supported Models:**
+
 - **Detection:** `rtmdet_tiny`, `rtmdet_s`, `rtmdet_m`, `rtmdet_l`, `rtmdet_x`
 - **Instance Segmentation:** `rtmdet-ins_tiny`, `rtmdet-ins_s`, `rtmdet-ins_m`, `rtmdet-ins_l`, `rtmdet-ins_x`

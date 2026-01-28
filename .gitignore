@@ -15,6 +15,7 @@ mmdetection/dist/
 mmdetection/*.egg-info/
 
 # Ignore checkpoints/weights (these are huge!)
+checkpoints/
 mmdetection/checkpoints/
 *.pth
 *.pkl
