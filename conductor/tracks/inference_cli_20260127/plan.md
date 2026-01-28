@@ -12,9 +12,9 @@
 
 ## Phase 2: Command Line Interface [checkpoint: PENDING]
 
-- [ ] Task: Scaffold `ez-mmdet` CLI with Typer
-    - [ ] Write tests for CLI argument parsing and error handling
-    - [ ] Create `src/ez_mmdetection/cli.py` and define the main entry point
+- [x] Task: Scaffold `ez-mmdet` CLI with Typer
+    - [x] Write tests for CLI argument parsing and error handling
+    - [x] Create `src/ez_mmdetection/cli.py` and define the main entry point
 - [ ] Task: Implement `train` command
     - [ ] Write integration tests for the `train` command (mocking the training loop)
     - [ ] Implement `train` command logic, bridging CLI args to `EZDetector.train()`

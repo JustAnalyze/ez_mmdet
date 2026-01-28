@@ -34,6 +34,9 @@ gpu = [
     "mmcv>=2.0.0rc4, <2.2.0",
 ]
 
+[project.scripts]
+ez-mmdet = "ez_mmdetection.cli:app"
+
 [tool.uv]
 managed = true
 package = true
