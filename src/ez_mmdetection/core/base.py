@@ -10,6 +10,7 @@ from mmengine.runner import Runner
 
 from ez_mmdetection.core.config_loader import get_config_file
 from ez_mmdetection.schemas.dataset import DatasetConfig
+from ez_mmdetection.schemas.inference import InferenceResult # New import
 from ez_mmdetection.utils.toml_config import (
     DataSection,
     ModelSection,
@@ -48,7 +49,7 @@ class EZMMDetector(ABC):
         device: str = "cpu",
         out_dir: Optional[str] = None,
         show: bool = False,
-    ) -> dict:
+    ) -> InferenceResult:
         """Performs object detection on an image.
 
         Args:
@@ -59,7 +60,7 @@ class EZMMDetector(ABC):
             show: Whether to display the image.
 
         Returns:
-            A dictionary containing the detection results.
+            A structured InferenceResult object.
         """
         if self._inferencer is None:
             logger.info(f"Initializing inferencer for model: {self.model_name}")
@@ -69,7 +70,7 @@ class EZMMDetector(ABC):
 
         logger.info(f"Running inference on: {image_path}")
         results = self._inferencer(str(image_path), out_dir=out_dir, show=show)
-        return results
+        return InferenceResult.from_mmdet(results)
 
     def train(
         self,

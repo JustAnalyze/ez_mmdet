@@ -5,9 +5,9 @@
 - [x] Task: Implement `predict()` method in `EZDetector`
     - [x] Write unit tests for `predict()` behavior (mocking `DetInferencer`)
     - [x] Implement `predict()` logic using MMDetection's high-level API
-- [ ] Task: Add result structure and visualization support
-    - [ ] Write tests for result parsing and output directory creation
-    - [ ] Implement detection result structuring and visualization logic
+- [x] Task: Add result structure and visualization support
+    - [x] Write tests for result parsing and output directory creation
+    - [x] Implement detection result structuring and visualization logic
 - [ ] Task: Conductor - User Manual Verification 'Inference API' (Protocol in workflow.md)
 
 ## Phase 2: Command Line Interface [checkpoint: PENDING]
