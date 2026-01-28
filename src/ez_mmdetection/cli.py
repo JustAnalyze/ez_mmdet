@@ -31,9 +31,16 @@ def predict(
     checkpoint_path: Path = typer.Argument(..., help="Path to the model checkpoint"),
     image_path: Path = typer.Argument(..., help="Path to the image for inference"),
     out_dir: Optional[str] = typer.Option(None, help="Directory to save visualization results"),
+    device: str = typer.Option("cpu", help="Computing device"),
 ):
     """Performs object detection on an image."""
-    typer.echo(f"Predicting with {model_name}")
+    detector = RTMDet(model_name=model_name)
+    detector.predict(
+        image_path=image_path,
+        checkpoint_path=checkpoint_path,
+        out_dir=out_dir,
+        device=device,
+    )
 
 if __name__ == "__main__":
     app()

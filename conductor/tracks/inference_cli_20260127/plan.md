@@ -18,7 +18,7 @@
 - [x] Task: Implement `train` command
     - [x] Write integration tests for the `train` command (mocking the training loop)
     - [x] Implement `train` command logic, bridging CLI args to `EZDetector.train()`
-- [ ] Task: Implement `predict` command
-    - [ ] Write integration tests for the `predict` command
-    - [ ] Implement `predict` command logic, bridging CLI args to `EZDetector.predict()`
+- [x] Task: Implement `predict` command
+    - [x] Write integration tests for the `predict` command
+    - [x] Implement `predict` command logic, bridging CLI args to `EZDetector.predict()`
 - [ ] Task: Conductor - User Manual Verification 'Command Line Interface' (Protocol in workflow.md)
