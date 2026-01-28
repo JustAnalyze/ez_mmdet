@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from loguru import logger
+from mmdet.apis import DetInferencer # New import
 from mmdet.utils import register_all_modules
 from mmengine.config import Config
 from mmengine.runner import Runner
@@ -27,7 +28,7 @@ class EZMMDetector(ABC):
     Implements the Template Method Pattern for the training workflow.
     """
 
-    def __init__(self, model_name: str = "rtmdet_tiny"):
+    def __init__(self, model_name: str):
         """Initializes the detector with a base model.
 
         Args:
@@ -36,10 +37,39 @@ class EZMMDetector(ABC):
         logger.info(
             f"Initializing {self.__class__.__name__} with base model: '{model_name}'"
         )
-        self.model_name = model_name
-        self.num_classes: Optional[int] = None
-        self.classes: Optional[List[str]] = None
+        self.model_name: str = model_name
         self._cfg: Optional[Config] = None
+        self._inferencer: Optional[DetInferencer] = None
+
+    def predict(
+        self,
+        image_path: Union[str, Path],
+        checkpoint_path: Union[str, Path],
+        device: str = "cpu",
+        out_dir: Optional[str] = None,
+        show: bool = False,
+    ) -> dict:
+        """Performs object detection on an image.
+
+        Args:
+            image_path: Path to the image file.
+            checkpoint_path: Path to the model checkpoint (.pth).
+            device: Computing device (default: 'cpu').
+            out_dir: Directory to save visualization results.
+            show: Whether to display the image.
+
+        Returns:
+            A dictionary containing the detection results.
+        """
+        if self._inferencer is None:
+            logger.info(f"Initializing inferencer for model: {self.model_name}")
+            self._inferencer = DetInferencer(
+                model=self.model_name, weights=str(checkpoint_path), device=device
+            )
+
+        logger.info(f"Running inference on: {image_path}")
+        results = self._inferencer(str(image_path), out_dir=out_dir, show=show)
+        return results
 
     def train(
         self,
@@ -70,7 +100,7 @@ class EZMMDetector(ABC):
         dataset_cfg = DatasetConfig.from_toml(Path(dataset_config_path))
         # Populate internal state from dataset config
         self.classes = dataset_cfg.classes
-        self.num_classes = (
+        self.num_classes: int = (
             len(dataset_cfg.classes) if dataset_cfg.classes else 80
         )
         # Construct the UserConfig artifact
@@ -174,4 +204,3 @@ class EZMMDetector(ABC):
     def _configure_model_specifics(self, config: UserConfig) -> None:
         """Subclasses must implement this to handle architecture-specific overrides."""
         pass
-

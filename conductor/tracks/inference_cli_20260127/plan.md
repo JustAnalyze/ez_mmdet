@@ -2,9 +2,9 @@
 
 ## Phase 1: Inference API [checkpoint: PENDING]
 
-- [ ] Task: Implement `predict()` method in `EZDetector`
-    - [ ] Write unit tests for `predict()` behavior (mocking `DetInferencer`)
-    - [ ] Implement `predict()` logic using MMDetection's high-level API
+- [x] Task: Implement `predict()` method in `EZDetector`
+    - [x] Write unit tests for `predict()` behavior (mocking `DetInferencer`)
+    - [x] Implement `predict()` logic using MMDetection's high-level API
 - [ ] Task: Add result structure and visualization support
     - [ ] Write tests for result parsing and output directory creation
     - [ ] Implement detection result structuring and visualization logic
