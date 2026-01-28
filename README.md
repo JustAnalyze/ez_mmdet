@@ -25,6 +25,21 @@ cd ez_mmdet
 uv sync --extra cpu --preview
 ```
 
+### 💡 Troubleshooting `uv sync`
+
+If `uv sync` fails (often due to MMDetection's complex build requirements), you can manually "bootstrap" the environment with the core build dependencies:
+
+```bash
+# 1. Install build-essential tools first
+uv pip install setuptools>=69.5.1 --index-strategy unsafe-best-match
+
+# 2. Install the Torch engine required for building
+uv pip install torch==1.13.1+cpu --index https://download.pytorch.org/whl/cpu
+
+# 3. Retry the project sync
+uv sync --extra cpu --preview
+```
+
 ---
 
 ## 📖 Quick Start
