@@ -21,23 +21,41 @@
 git clone --recursive https://github.com/JustAnalyze/ez_mmdet.git
 cd ez_mmdet
 
-# Install with working versions of dependencies
+# Install for CPU
 uv sync --extra cpu --preview
+
+# OR: Install for GPU (CUDA 11.7)
+uv sync --extra gpu --preview
 ```
 
 ### 💡 Troubleshooting `uv sync`
 
 If `uv sync` fails (often due to MMDetection's complex build requirements), you can manually "bootstrap" the environment with the core build dependencies:
 
+**For CPU:**
+
 ```bash
 # 1. Install build-essential tools first
 uv pip install setuptools>=69.5.1 --index-strategy unsafe-best-match
 
 # 2. Install the Torch engine required for building
-uv pip install torch==1.13.1+cpu --index https://download.pytorch.org/whl/cpu
+uv pip install torch==2.0.1+cpu --index https://download.pytorch.org/whl/cpu
 
 # 3. Retry the project sync
 uv sync --extra cpu --preview
+```
+
+**For GPU (CUDA 11.7):**
+
+```bash
+# 1. Install build-essential tools first
+uv pip install setuptools>=69.5.1 --index-strategy unsafe-best-match
+
+# 2. Install the Torch engine required for building
+uv pip install torch==2.0.1+cu117 --index https://download.pytorch.org/whl/cu117
+
+# 3. Retry the project sync
+uv sync --extra gpu --preview
 ```
 
 ---
