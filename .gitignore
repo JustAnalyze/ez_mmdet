@@ -23,6 +23,3 @@ mmdetection/checkpoints/
 output_test/
 runs/
 dummy_data/
-
-# todo
-todo.md
