@@ -19,4 +19,5 @@
 - **uv:** The primary tool for dependency management, environment isolation, and project synchronization.
 - **setuptools:** Used as the build backend for the project.
 - **pytest:** The standard testing framework for unit and integration tests.
+- **pytest-cov:** Used for generating code coverage reports, with a project-wide target of >80% coverage.
 - **ruff:** The unified Python linter and formatter.
