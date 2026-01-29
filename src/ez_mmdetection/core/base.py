@@ -49,14 +49,18 @@ class EZMMDetector(ABC):
             f"Initializing {self.__class__.__name__} with base model: '{model_name}'"
         )
         self.model_name: str = (
-            model_name.value if isinstance(model_name, ModelName) else model_name
+            model_name.value
+            if isinstance(model_name, ModelName)
+            else model_name
         )
         self.log_level: str = log_level
         self._cfg: Optional[Config] = None
         self._inferencer: Optional[DetInferencer] = None
 
         # Resolve or download checkpoint
-        self.checkpoint_path = ensure_model_checkpoint(self.model_name, checkpoint_path)
+        self.checkpoint_path = ensure_model_checkpoint(
+            self.model_name, checkpoint_path
+        )
 
         # Configure loguru level
         try:
@@ -108,7 +112,9 @@ class EZMMDetector(ABC):
 
         logger.info(f"Running inference on: {image_path}")
         # Ensure out_dir is not None, as DetInferencer expects a string or PathLike
-        results = self._inferencer(str(image_path), out_dir=out_dir or "", show=show)
+        results = self._inferencer(
+            str(image_path), out_dir=out_dir or "", show=show
+        )
         return InferenceResult.from_mmdet(results)
 
     def train(
@@ -120,8 +126,8 @@ class EZMMDetector(ABC):
         work_dir: str = "./runs/train",
         learning_rate: float = 0.001,
         amp: bool = True,
-        num_workers: int = 2,
-        enable_tensorboard: bool = True,
+        num_workers: int = 4,
+        enable_tensorboard: bool = False,
         load_from: Optional[str] = None,
         log_level: Optional[str] = None,
     ) -> None:
@@ -144,11 +150,15 @@ class EZMMDetector(ABC):
         # Use provided load_from or the one from initialization
         final_load_from = load_from or str(self.checkpoint_path)
 
-        logger.info(f"Loading dataset configuration from: {dataset_config_path}")
+        logger.info(
+            f"Loading dataset configuration from: {dataset_config_path}"
+        )
         dataset_cfg = DatasetConfig.from_toml(Path(dataset_config_path))
 
         self.classes = dataset_cfg.classes
-        self.num_classes: int = len(dataset_cfg.classes) if dataset_cfg.classes else 80
+        self.num_classes: int = (
+            len(dataset_cfg.classes) if dataset_cfg.classes else 80
+        )
 
         user_config = UserConfig(
             model=ModelSection(
@@ -162,8 +172,12 @@ class EZMMDetector(ABC):
                 train_img=dataset_cfg.train.img_dir,
                 val_ann=dataset_cfg.val.ann_file,
                 val_img=dataset_cfg.val.img_dir,
-                test_ann=dataset_cfg.test.ann_file if dataset_cfg.test else None,
-                test_img=dataset_cfg.test.img_dir if dataset_cfg.test else None,
+                test_ann=dataset_cfg.test.ann_file
+                if dataset_cfg.test
+                else None,
+                test_img=dataset_cfg.test.img_dir
+                if dataset_cfg.test
+                else None,
                 classes=self.classes,
             ),
             training=TrainingSection(
@@ -187,7 +201,9 @@ class EZMMDetector(ABC):
         work_dir = Path(config.training.work_dir)
         work_dir.mkdir(parents=True, exist_ok=True)
         save_user_config(config, work_dir / "user_config.toml")
-        logger.info(f"User configuration saved to: {work_dir / 'user_config.toml'}")
+        logger.info(
+            f"User configuration saved to: {work_dir / 'user_config.toml'}"
+        )
 
         # 2. Load and Apply Overrides
         self._cfg = self._load_base_config(config.model.name)
