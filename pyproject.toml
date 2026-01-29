@@ -2,7 +2,7 @@
 name = "ez_openmmlab"
 version = "0.1.0"
 description = "a user-friendly api for openmmlab libraries"
-readme = "readme.md"
+readme = "README.md"
 requires-python = ">=3.9,<3.11"
 dependencies = [
     "setuptools>=69.5.1",
@@ -19,7 +19,7 @@ dependencies = [
     "tomli-w>=1.2.0",
     "tomli>=2.4.0",
     "numpy==1.23.5",
-    "opencv-python-headless==4.8.0.76",
+    "opencv-python==4.8.0.76",
     "requests>=2.32.5",
 ]
 
