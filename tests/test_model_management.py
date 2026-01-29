@@ -1,9 +1,9 @@
 import pytest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-from ez_mmdetection.core.config_loader import ConfigLoader
-from ez_mmdetection.utils.download import ensure_model_checkpoint
-from ez_mmdetection.schemas.model import ModelName, MODEL_URLS
+from ez_openmmlab.core.config_loader import ConfigLoader
+from ez_openmmlab.utils.download import ensure_model_checkpoint
+from ez_openmmlab.schemas.model import ModelName, MODEL_URLS
 
 @pytest.fixture
 def mock_config_root(tmp_path):
@@ -46,7 +46,7 @@ def test_config_loader_missing_file(mock_config_root, tmp_path):
         with pytest.raises(FileNotFoundError, match="not found at"):
             loader.get_config_path("rtmdet_tiny")
 
-@patch("ez_mmdetection.utils.download.download_checkpoint")
+@patch("ez_openmmlab.utils.download.download_checkpoint")
 def test_ensure_model_checkpoint_existing(mock_download, tmp_path):
     """Test that ensure_model_checkpoint returns path if file exists."""
     checkpoint_dir = tmp_path / "checkpoints"
@@ -59,7 +59,7 @@ def test_ensure_model_checkpoint_existing(mock_download, tmp_path):
         assert path == checkpoint_file
         mock_download.assert_not_called()
 
-@patch("ez_mmdetection.utils.download.download_checkpoint")
+@patch("ez_openmmlab.utils.download.download_checkpoint")
 def test_ensure_model_checkpoint_download_trigger(mock_download, tmp_path):
     """Test that ensure_model_checkpoint triggers download if file is missing."""
     with patch("pathlib.Path.cwd", return_value=tmp_path):

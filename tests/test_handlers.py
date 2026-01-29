@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import MagicMock
 from mmengine.config import Config, ConfigDict
-from ez_mmdetection.core.handlers import DataloaderHandler, RuntimeHandler
-from ez_mmdetection.utils.toml_config import UserConfig, DataSection, TrainingSection, ModelSection
+from ez_openmmlab.core.handlers import DataloaderHandler, RuntimeHandler
+from ez_openmmlab.utils.toml_config import UserConfig, DataSection, TrainingSection, ModelSection
 
 @pytest.fixture
 def mock_user_config():

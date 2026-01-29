@@ -6,7 +6,7 @@ import tomli_w
 from pydantic import BaseModel, Field
 
 
-from ez_mmdetection.schemas.model import ModelName
+from ez_openmmlab.schemas.model import ModelName
 
 from pydantic import BaseModel, Field, ConfigDict
 

@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from ez_mmdetection import RTMDet
-from ez_mmdetection.schemas.model import ModelName
+from ez_openmmlab import RTMDet
+from ez_openmmlab.schemas.model import ModelName
 
 
 @pytest.fixture(scope="module")

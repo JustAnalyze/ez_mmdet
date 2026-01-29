@@ -5,8 +5,8 @@ def test_predict_initializes_inferencer_and_calls_it():
 import pytest
 from unittest.mock import MagicMock, patch
 from pathlib import Path
-from ez_mmdetection import RTMDet
-from ez_mmdetection.schemas.inference import InferenceResult
+from ez_openmmlab import RTMDet
+from ez_openmmlab.schemas.inference import InferenceResult
 
 def test_predict_initializes_inferencer_and_calls_it():
     """
@@ -20,7 +20,7 @@ def test_predict_initializes_inferencer_and_calls_it():
     # Mock result
     mock_result = {"predictions": [{"labels": [0], "scores": [0.9], "bboxes": [[10, 10, 100, 100]]}]}
     
-    with patch("ez_mmdetection.core.base.DetInferencer") as mock_inferencer_cls:
+    with patch("ez_openmmlab.core.detection.DetInferencer") as mock_inferencer_cls:
         # Configure mock inferencer instance
         mock_inferencer_instance = MagicMock()
         mock_inferencer_instance.return_value = mock_result
@@ -59,7 +59,7 @@ def test_predict_with_out_dir_creates_directory(tmp_path):
     image_path = "demo.jpg"
     out_dir = tmp_path / "results"
     
-    with patch("ez_mmdetection.core.base.DetInferencer") as mock_inferencer_cls:
+    with patch("ez_openmmlab.core.detection.DetInferencer") as mock_inferencer_cls:
         mock_inferencer_instance = MagicMock()
         mock_inferencer_instance.return_value = {"predictions": []}
         mock_inferencer_cls.return_value = mock_inferencer_instance

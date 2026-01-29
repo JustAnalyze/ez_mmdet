@@ -1,7 +1,7 @@
 from loguru import logger
 
-from ez_mmdetection.core.base import EZMMDetector
-from ez_mmdetection.utils.toml_config import UserConfig
+from ez_openmmlab.core.detection import EZMMDetector
+from ez_openmmlab.utils.toml_config import UserConfig
 
 
 class RTMDet(EZMMDetector):

@@ -12,7 +12,7 @@ from rich.progress import (
     TransferSpeedColumn,
 )
 
-from ez_mmdetection.schemas.model import ModelName
+from ez_openmmlab.schemas.model import ModelName
 
 def download_checkpoint(url: str, dest_path: Path) -> None:
     """Downloads a file from a URL to a destination path with a progress bar."""

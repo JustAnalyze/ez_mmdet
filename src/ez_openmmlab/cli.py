@@ -3,8 +3,8 @@ from typing import Optional
 
 import typer
 
-from ez_mmdetection import RTMDet
-from ez_mmdetection.schemas.model import ModelName  # New import
+from ez_openmmlab import RTMDet
+from ez_openmmlab.schemas.model import ModelName  # New import
 
 app = typer.Typer(help="ez_mmdet: A user-friendly CLI for MMDetection")
 

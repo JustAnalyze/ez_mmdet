@@ -12,7 +12,7 @@ This track focuses on enabling end-to-end usage of `ez_mmdet` by implementing a 
 ## Requirements
 
 ### Inference API
-- **Location:** `src/ez_mmdetection/core/base.py` (added to `EZDetector`).
+- **Location:** `src/ez_openmmlab/core/base.py` (added to `EZDetector`).
 - **Functionality:**
     - Accept an image (path or numpy array) and a checkpoint path.
     - Initialize the underlying MMDetection inferencer on the fly if not already initialized.

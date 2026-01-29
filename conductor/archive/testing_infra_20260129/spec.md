@@ -16,7 +16,7 @@ This track focuses on building a robust automated testing suite for `ez_mmdet`. 
 - **E2E Smoke Tests:** Create a minimal end-to-end flow using dummy data and CPU to verify the full "Train -> Save -> Predict" loop.
 
 ## Non-Functional Requirements
-- **Total Code Coverage:** Aim for >80% coverage across the `src/ez_mmdetection` package.
+- **Total Code Coverage:** Aim for >80% coverage across the `src/ez_openmmlab` package.
 - **Execution Efficiency:** Tests should run quickly and be easily executable via `uv run pytest`.
 - **Environment Agnostic:** Tests should pass on both CPU and GPU-enabled environments (using mocks where appropriate).
 

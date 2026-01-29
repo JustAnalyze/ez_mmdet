@@ -84,7 +84,7 @@ img_dir = "images/val"
 #### Using Python
 
 ```python
-from ez_mmdetection import RTMDet
+from ez_openmmlab import RTMDet
 
 # Initialize (choices: rtmdet_tiny, rtmdet_s, rtmdet-ins_tiny, etc.)
 detector = RTMDet("rtmdet_tiny")
@@ -109,7 +109,7 @@ ez-mmdet train rtmdet_tiny dataset.toml --epochs 50 --batch-size 8
 `ez_mmdet` automatically manages your checkpoints. If you don't provide a path, it downloads the best official model for you.
 
 ```python
-from ez_mmdetection import RTMDet
+from ez_openmmlab import RTMDet
 
 detector = RTMDet("rtmdet_tiny")
 

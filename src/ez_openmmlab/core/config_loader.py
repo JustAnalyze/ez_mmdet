@@ -1,6 +1,6 @@
 from pathlib import Path
 from loguru import logger
-from ez_mmdetection.schemas.model import ModelName
+from ez_openmmlab.schemas.model import ModelName
 
 class ConfigLoader:
     """Resolves model names to absolute paths of official MMDetection config files."""

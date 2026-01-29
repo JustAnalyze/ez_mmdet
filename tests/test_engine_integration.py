@@ -1,8 +1,8 @@
 import pytest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-from ez_mmdetection import RTMDet
-from ez_mmdetection.schemas.model import ModelName
+from ez_openmmlab import RTMDet
+from ez_openmmlab.schemas.model import ModelName
 
 @pytest.fixture
 def dummy_dataset_config(tmp_path):
@@ -22,8 +22,8 @@ def dummy_dataset_config(tmp_path):
     """)
     return config_path
 
-@patch("ez_mmdetection.core.base.Runner")
-@patch("ez_mmdetection.core.base.ensure_model_checkpoint")
+@patch("ez_openmmlab.core.base.Runner")
+@patch("ez_openmmlab.core.base.ensure_model_checkpoint")
 def test_train_orchestration_and_artifact_creation(mock_ensure, mock_runner, dummy_dataset_config, tmp_path):
     """
     Integration test for EZMMDetector.train:
@@ -51,10 +51,10 @@ def test_train_orchestration_and_artifact_creation(mock_ensure, mock_runner, dum
     cfg = mock_runner.from_cfg.call_args[0][0]
     
     # Verify some key config overrides were applied (Integration between base.py and handlers)
-from ez_mmdetection.schemas.inference import InferenceResult
+from ez_openmmlab.schemas.inference import InferenceResult
 
-@patch("ez_mmdetection.core.base.DetInferencer")
-@patch("ez_mmdetection.core.base.ensure_model_checkpoint")
+@patch("ez_openmmlab.core.detection.DetInferencer")
+@patch("ez_openmmlab.core.base.ensure_model_checkpoint")
 def test_predict_result_conversion(mock_ensure, mock_inferencer_cls):
     """Verifies that predict() returns a structured InferenceResult."""
     mock_ensure.return_value = Path("dummy.pth")

@@ -1,11 +1,11 @@
 import pytest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-from ez_mmdetection import RTMDet
-from ez_mmdetection.schemas.model import ModelName
+from ez_openmmlab import RTMDet
+from ez_openmmlab.schemas.model import ModelName
 
-@patch("ez_mmdetection.core.base.DetInferencer")
-@patch("ez_mmdetection.core.base.ensure_model_checkpoint")
+@patch("ez_openmmlab.core.detection.DetInferencer")
+@patch("ez_openmmlab.core.base.ensure_model_checkpoint")
 def test_predict_handles_none_out_dir(mock_ensure, mock_inferencer_cls):
     """
     Regression test: Verifies that predict() handles out_dir=None correctly
@@ -26,8 +26,8 @@ def test_predict_handles_none_out_dir(mock_ensure, mock_inferencer_cls):
     args, kwargs = mock_inferencer_instance.call_args
     assert kwargs["out_dir"] == ""
 
-@patch("ez_mmdetection.core.base.DetInferencer")
-@patch("ez_mmdetection.core.base.ensure_model_checkpoint")
+@patch("ez_openmmlab.core.detection.DetInferencer")
+@patch("ez_openmmlab.core.base.ensure_model_checkpoint")
 def test_predict_resolves_config_path(mock_ensure, mock_inferencer_cls):
     """
     Regression test: Verifies that predict() resolves model name to full path

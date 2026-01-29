@@ -1,6 +1,6 @@
 import pytest
 from typer.testing import CliRunner
-from ez_mmdetection.cli import app
+from ez_openmmlab.cli import app
 from unittest.mock import MagicMock, patch
 
 runner = CliRunner()
@@ -31,7 +31,7 @@ def test_predict_command_calls_detector_predict(tmp_path):
     image = tmp_path / "demo.jpg"
     image.touch()
     
-    with patch("ez_mmdetection.cli.RTMDet") as mock_detector_cls:
+    with patch("ez_openmmlab.cli.RTMDet") as mock_detector_cls:
         mock_detector_instance = MagicMock()
         mock_detector_cls.return_value = mock_detector_instance
         

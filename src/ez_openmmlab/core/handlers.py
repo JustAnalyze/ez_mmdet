@@ -3,7 +3,7 @@ from pathlib import Path
 
 from mmengine.config import Config
 
-from ez_mmdetection.utils.toml_config import UserConfig
+from ez_openmmlab.utils.toml_config import UserConfig
 
 
 class BaseConfigHandler(ABC):

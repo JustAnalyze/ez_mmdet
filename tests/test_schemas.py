@@ -1,9 +1,9 @@
 import pytest
 from pathlib import Path
 from pydantic import ValidationError
-from ez_mmdetection.utils.toml_config import UserConfig, TrainingSection, ModelSection, DataSection
-from ez_mmdetection.schemas.dataset import DatasetConfig, SplitConfig
-from ez_mmdetection.schemas.model import ModelName
+from ez_openmmlab.utils.toml_config import UserConfig, TrainingSection, ModelSection, DataSection
+from ez_openmmlab.schemas.dataset import DatasetConfig, SplitConfig
+from ez_openmmlab.schemas.model import ModelName
 
 def test_training_section_defaults():
     """Test TrainingSection default values."""

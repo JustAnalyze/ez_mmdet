@@ -3,7 +3,7 @@ import tomli
 from pydantic import ValidationError
 import pytest
 
-from ez_mmdetection.utils.toml_config import (
+from ez_openmmlab.utils.toml_config import (
     UserConfig,
     ModelSection,
     DataSection,

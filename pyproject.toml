@@ -1,7 +1,7 @@
 [project]
-name = "ez_mmdet"
+name = "ez_openmmlab"
 version = "0.1.0"
-description = "A user-friendly API for MMDetection"
+description = "A user-friendly API for OpenMMLab libraries"
 readme = "README.md"
 requires-python = ">=3.9,<3.11"
 dependencies = [
@@ -9,6 +9,8 @@ dependencies = [
     "mmengine>=0.10.7",
     "openmim>=0.3.9",
     "mmdet",
+    "mmpose",
+    "chumpy == 0.70",  # for MMPose 1.3.2
     "pycocotools>=2.0.7",
     "pydantic>=2.0.0",
     "typer>=0.9.0",
@@ -22,7 +24,7 @@ dependencies = [
 ]
 
 [project.scripts]
-ez-mmdet = "ez_mmdetection.cli:app"
+ez-mmdet = "ez_openmmlab.cli:app"
 
 # --- OPTIONAL DEPENDENCIES (The Switch) ---
 [project.optional-dependencies]
@@ -47,7 +49,7 @@ environments = [
     "sys_platform == 'win32'",
     "sys_platform == 'linux'"
 ]
-no-build-isolation-package = ["mmdet"]
+no-build-isolation-package = ["mmdet", "mmpose"]
 
 # Declare conflicts between cpu and gpu extras
 conflicts = [
@@ -83,7 +85,8 @@ explicit = true
 
 # 4. SOURCES - Map packages to indexes based on extra
 [tool.uv.sources]
-mmdetection = { path = "./libs/mmdetection", editable = true }
+mmdet = { path = "./libs/mmdetection", editable = true }
+mmpose = { path = "./libs/mmpose", editable = true }
 
 # Map PyTorch packages to CPU or GPU index
 torch = [
@@ -107,6 +110,8 @@ mmcv = [
 
 [tool.uv.extra-build-dependencies]
 mmdet = ["setuptools==69.5.1", "wheel"]
+mmpose = ["setuptools==69.5.1", "wheel"]
+chumpy = ["pip"]
 
 [build-system]
 requires = ["setuptools>=69.5.1", "wheel"]
