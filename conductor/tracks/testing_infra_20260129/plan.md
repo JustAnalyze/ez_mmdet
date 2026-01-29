@@ -6,9 +6,9 @@
     - [x] Write unit tests for `UserConfig` and `TrainingSection` (validating defaults and constraints)
     - [x] Write unit tests for `DatasetConfig` (validating TOML parsing and required fields)
     - [x] Write unit tests for `ModelName` enum validation
-- [ ] Task: Implement Model Management tests
-    - [ ] Write unit tests for `ConfigLoader` (verifying strict mapping and path resolution)
-    - [ ] Write unit tests for `ensure_model_checkpoint` (mocking requests and file system)
+- [x] Task: Implement Model Management tests
+    - [x] Write unit tests for `ConfigLoader` (verifying strict mapping and path resolution)
+    - [x] Write unit tests for `ensure_model_checkpoint` (mocking requests and file system)
 - [ ] Task: Refine Handler tests
     - [ ] Expand `tests/test_handlers.py` to cover edge cases for `DataloaderHandler` and `RuntimeHandler`
 - [ ] Task: Conductor - User Manual Verification 'Unit & Schema Tests' (Protocol in workflow.md)
