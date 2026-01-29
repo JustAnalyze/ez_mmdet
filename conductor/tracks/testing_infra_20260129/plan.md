@@ -23,7 +23,7 @@
     - [x] Add explicit test cases for the model name path resolution fix
 - [x] Task: Conductor - User Manual Verification 'Integration & Regression Tests' (Protocol in workflow.md)
 
-## Phase 3: E2E Smoke Tests & Coverage Audit [checkpoint: 15b394c]
+## Phase 3: E2E Smoke Tests & Coverage Audit [checkpoint: ec8de94]
 
 - [x] Task: Implement E2E Smoke tests
     - [x] Create a minimal end-to-end test that runs a 1-epoch training pass on dummy data (CPU)
