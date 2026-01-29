@@ -118,11 +118,11 @@ class EZMMDetector(ABC):
         device: str = "cuda",
         work_dir: str = "./runs/train",
         learning_rate: float = 0.001,
-        load_from: Optional[str] = None,
-        log_level: Optional[str] = None,
         amp: bool = True,
         num_workers: int = 2,
-        enable_tensorboard: bool = True,
+        enable_tensorboard: bool = False,
+        load_from: Optional[str] = None,
+        log_level: Optional[str] = None,
     ) -> None:
         """The Template Method defining the training workflow.
 
@@ -233,7 +233,7 @@ class EZMMDetector(ABC):
         # Data roots and paths
         data_root = Path(config.data.root)
         self._cfg.data_root = str(data_root)
-        
+
         for key in ["train_dataloader", "val_dataloader", "test_dataloader"]:
             if hasattr(self._cfg, key):
                 dl = getattr(self._cfg, key)
@@ -245,10 +245,14 @@ class EZMMDetector(ABC):
                 # Use absolute paths for annotations and images
                 if key == "train_dataloader":
                     dl.dataset.ann_file = str(data_root / config.data.train_ann)
-                    dl.dataset.data_prefix = {"img": str(data_root / config.data.train_img)}
+                    dl.dataset.data_prefix = {
+                        "img": str(data_root / config.data.train_img)
+                    }
                 else:
                     dl.dataset.ann_file = str(data_root / config.data.val_ann)
-                    dl.dataset.data_prefix = {"img": str(data_root / config.data.val_img)}
+                    dl.dataset.data_prefix = {
+                        "img": str(data_root / config.data.val_img)
+                    }
 
                 if config.data.classes:
                     dl.dataset.metainfo = {"classes": config.data.classes}
@@ -260,21 +264,26 @@ class EZMMDetector(ABC):
         # Configure TensorBoard backend
         if config.training.enable_tensorboard:
             # Ensure visualizer exists and has vis_backends list
-            if not hasattr(self._cfg, 'visualizer'):
-                self._cfg.visualizer = dict(type='DetLocalVisualizer', vis_backends=[dict(type='LocalVisBackend')])
-            
-            if 'vis_backends' not in self._cfg.visualizer:
-                self._cfg.visualizer['vis_backends'] = [dict(type='LocalVisBackend')]
-            
+            if not hasattr(self._cfg, "visualizer"):
+                self._cfg.visualizer = dict(
+                    type="DetLocalVisualizer",
+                    vis_backends=[dict(type="LocalVisBackend")],
+                )
+
+            if "vis_backends" not in self._cfg.visualizer:
+                self._cfg.visualizer["vis_backends"] = [dict(type="LocalVisBackend")]
+
             # Check if TensorboardVisBackend is already there
             has_tb = False
-            for backend in self._cfg.visualizer['vis_backends']:
-                if backend['type'] == 'TensorboardVisBackend':
+            for backend in self._cfg.visualizer["vis_backends"]:
+                if backend["type"] == "TensorboardVisBackend":
                     has_tb = True
                     break
-            
+
             if not has_tb:
-                self._cfg.visualizer['vis_backends'].append(dict(type='TensorboardVisBackend'))
+                self._cfg.visualizer["vis_backends"].append(
+                    dict(type="TensorboardVisBackend")
+                )
 
         # Override Evaluators
         # Evaluators often need absolute paths if data_root isn't explicitly used by them

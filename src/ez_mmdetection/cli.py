@@ -4,16 +4,14 @@ from typing import Optional
 import typer
 
 from ez_mmdetection import RTMDet
-from ez_mmdetection.schemas.model import ModelName # New import
+from ez_mmdetection.schemas.model import ModelName  # New import
 
 app = typer.Typer(help="ez_mmdet: A user-friendly CLI for MMDetection")
 
 
 @app.command()
 def train(
-    model_name: ModelName = typer.Argument(
-        ..., help="Name of the model architecture"
-    ),
+    model_name: ModelName = typer.Argument(..., help="Name of the model architecture"),
     dataset_config_path: Path = typer.Argument(
         ..., help="Path to the dataset.toml file"
     ),
@@ -26,7 +24,7 @@ def train(
     device: str = typer.Option("cuda", help="Training device"),
     learning_rate: float = typer.Option(0.001, help="Initial learning rate"),
     amp: bool = typer.Option(True, help="Enable Automatic Mixed Precision training"),
-    tensorboard: bool = typer.Option(True, help="Enable TensorBoard logging"),
+    tensorboard: bool = typer.Option(False, help="Enable TensorBoard logging"),
 ):
     """Starts model training using a dataset configuration."""
     detector = RTMDet(model_name=model_name)
@@ -45,15 +43,9 @@ def train(
 
 @app.command()
 def predict(
-    model_name: ModelName = typer.Argument(
-        ..., help="Name of the model architecture"
-    ),
-    checkpoint_path: Path = typer.Argument(
-        ..., help="Path to the model checkpoint"
-    ),
-    image_path: Path = typer.Argument(
-        ..., help="Path to the image for inference"
-    ),
+    model_name: ModelName = typer.Argument(..., help="Name of the model architecture"),
+    checkpoint_path: Path = typer.Argument(..., help="Path to the model checkpoint"),
+    image_path: Path = typer.Argument(..., help="Path to the image for inference"),
     out_dir: Optional[str] = typer.Option(
         "runs/preds", help="Directory to save visualization results"
     ),
