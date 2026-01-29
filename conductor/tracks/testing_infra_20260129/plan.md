@@ -13,7 +13,7 @@
     - [x] Expand `tests/test_handlers.py` to cover edge cases for `DataloaderHandler` and `RuntimeHandler`
 - [x] Task: Conductor - User Manual Verification 'Unit & Schema Tests' (Protocol in workflow.md)
 
-## Phase 2: Integration & Regression Tests [checkpoint: PENDING]
+## Phase 2: Integration & Regression Tests [checkpoint: 8924112]
 
 - [x] Task: Implement Engine Integration tests
     - [x] Write integration tests for `EZMMDetector.train` (verifying handler orchestration and `user_config.toml` creation)
@@ -21,7 +21,7 @@
 - [x] Task: Implement Regression tests
     - [x] Add explicit test cases for the `NoneType` visualization error fix
     - [x] Add explicit test cases for the model name path resolution fix
-- [ ] Task: Conductor - User Manual Verification 'Integration & Regression Tests' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Integration & Regression Tests' (Protocol in workflow.md)
 
 ## Phase 3: E2E Smoke Tests & Coverage Audit [checkpoint: PENDING]
 
