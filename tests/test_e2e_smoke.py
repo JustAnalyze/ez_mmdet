@@ -9,9 +9,9 @@ from ez_mmdetection.schemas.model import ModelName
 @pytest.fixture(scope="module")
 def smoke_test_data():
     """Returns path to existing mini coco dummy data if available, or skips."""
-    data_toml = Path("datasets/coco_mini/dataset.toml")
+    data_toml = Path("tests/data/coco_mini/dataset.toml")
     if not data_toml.exists():
-        # Fallback to coco128 if mini not created (though we just created it)
+        # Fallback to coco128 if mini not created
         data_toml = Path("datasets/coco128_coco/dataset.toml")
 
     if not data_toml.exists():
@@ -44,7 +44,7 @@ def test_e2e_train_predict_loop(smoke_test_data, tmp_path):
 
     # 3. Run Inference using the new checkpoint
     # We use an image from the mini dataset for inference
-    image_path = list(Path("datasets/coco_mini/images").rglob("*.jpg"))[0]
+    image_path = list(Path("tests/data/coco_mini/images").rglob("*.jpg"))[0]
     result = detector.predict(
         image_path=str(image_path),
         checkpoint_path=str(checkpoint),
