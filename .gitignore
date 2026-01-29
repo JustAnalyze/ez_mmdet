@@ -10,13 +10,18 @@ wheels/
 .venv
 
 # Ignore build and installation files
-mmdetection/build/
-mmdetection/dist/
-mmdetection/*.egg-info/
+./libs/mmdetection/build/
+./libs/mmdetection/dist/
+./libs/mmdetection/*.egg-info/
+./libs/mmpose/build/
+./libs/mmpose/dist/
+./libs/mmpose/*.egg-info/
+
 
 # Ignore checkpoints/weights (these are huge!)
 checkpoints/
-mmdetection/checkpoints/
+./libs/mmdetection/checkpoints/
+./libs/mmpose/checkpoints/
 *.pth
 *.pkl
 
