@@ -9,8 +9,8 @@
 - [x] Task: Implement Model Management tests
     - [x] Write unit tests for `ConfigLoader` (verifying strict mapping and path resolution)
     - [x] Write unit tests for `ensure_model_checkpoint` (mocking requests and file system)
-- [ ] Task: Refine Handler tests
-    - [ ] Expand `tests/test_handlers.py` to cover edge cases for `DataloaderHandler` and `RuntimeHandler`
+- [x] Task: Refine Handler tests
+    - [x] Expand `tests/test_handlers.py` to cover edge cases for `DataloaderHandler` and `RuntimeHandler`
 - [ ] Task: Conductor - User Manual Verification 'Unit & Schema Tests' (Protocol in workflow.md)
 
 ## Phase 2: Integration & Regression Tests [checkpoint: PENDING]
