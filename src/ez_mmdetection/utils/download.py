@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Optional, Union
 
 import requests
 from loguru import logger
@@ -13,23 +13,6 @@ from rich.progress import (
 )
 
 from ez_mmdetection.schemas.model import ModelName
-
-# Mapping of model names to their official MMDetection checkpoint URLs
-MODEL_URLS: Dict[str, str] = {
-    # Bounding Box detection
-    ModelName.RTM_DET_TINY.value: "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet_tiny_8xb32-300e_coco/rtmdet_tiny_8xb32-300e_coco_20220902_112414-78e30dcc.pth",
-    ModelName.RTM_DET_S.value: "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet_s_8xb32-300e_coco/rtmdet_s_8xb32-300e_coco_20220905_161602-387a891e.pth",
-    ModelName.RTM_DET_M.value: "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet_m_8xb32-300e_coco/rtmdet_m_8xb32-300e_coco_20220719_112220-229f527c.pth",
-    ModelName.RTM_DET_L.value: "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet_l_8xb32-300e_coco/rtmdet_l_8xb32-300e_coco_20220719_112030-5a0be7c4.pth",
-    ModelName.RTM_DET_X.value: "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet_x_8xb32-300e_coco/rtmdet_x_8xb32-300e_coco_20220715_230555-cc79b9ae.pth",
-    # Instance Segmentation
-    ModelName.RTM_DET_INS_TINY.value: "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet-ins_tiny_8xb32-300e_coco/rtmdet-ins_tiny_8xb32-300e_coco_20221130_151727-ec670f7e.pth",
-    ModelName.RTM_DET_INS_S.value: "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet-ins_s_8xb32-300e_coco/rtmdet-ins_s_8xb32-300e_coco_20221121_212604-fdc5d7ec.pth",
-    ModelName.RTM_DET_INS_M.value: "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet-ins_m_8xb32-300e_coco/rtmdet-ins_m_8xb32-300e_coco_20221123_001039-6eba602e.pth",
-    ModelName.RTM_DET_INS_L.value: "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet-ins_l_8xb32-300e_coco/rtmdet-ins_l_8xb32-300e_coco_20221124_103237-78d1d652.pth",
-    ModelName.RTM_DET_INS_X.value: "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet-ins_x_8xb16-300e_coco/rtmdet-ins_x_8xb16-300e_coco_20221124_111313-33d4595b.pth",
-}
-
 
 def download_checkpoint(url: str, dest_path: Path) -> None:
     """Downloads a file from a URL to a destination path with a progress bar."""
@@ -85,8 +68,10 @@ def ensure_model_checkpoint(
     if path.exists():
         return path
 
-    url = MODEL_URLS.get(model_name)
-    if not url:
+    try:
+        model = ModelName(model_name)
+        url = model.weights_url
+    except ValueError:
         if checkpoint_path:
             logger.error(
                 f"Checkpoint not found at {path} and no download URL for {model_name}"

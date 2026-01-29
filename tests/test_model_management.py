@@ -2,8 +2,8 @@ import pytest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 from ez_mmdetection.core.config_loader import ConfigLoader
-from ez_mmdetection.utils.download import ensure_model_checkpoint, MODEL_URLS
-from ez_mmdetection.schemas.model import ModelName
+from ez_mmdetection.utils.download import ensure_model_checkpoint
+from ez_mmdetection.schemas.model import ModelName, MODEL_URLS
 
 @pytest.fixture
 def mock_config_root(tmp_path):

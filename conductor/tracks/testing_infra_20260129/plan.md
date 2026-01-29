@@ -15,12 +15,12 @@
 
 ## Phase 2: Integration & Regression Tests [checkpoint: PENDING]
 
-- [ ] Task: Implement Engine Integration tests
-    - [ ] Write integration tests for `EZMMDetector.train` (verifying handler orchestration and `user_config.toml` creation)
-    - [ ] Write integration tests for `EZMMDetector.predict` (verifying `InferenceResult` creation)
-- [ ] Task: Implement Regression tests
-    - [ ] Add explicit test cases for the `NoneType` visualization error fix
-    - [ ] Add explicit test cases for the model name path resolution fix
+- [x] Task: Implement Engine Integration tests
+    - [x] Write integration tests for `EZMMDetector.train` (verifying handler orchestration and `user_config.toml` creation)
+    - [x] Write integration tests for `EZMMDetector.predict` (verifying `InferenceResult` creation)
+- [x] Task: Implement Regression tests
+    - [x] Add explicit test cases for the `NoneType` visualization error fix
+    - [x] Add explicit test cases for the model name path resolution fix
 - [ ] Task: Conductor - User Manual Verification 'Integration & Regression Tests' (Protocol in workflow.md)
 
 ## Phase 3: E2E Smoke Tests & Coverage Audit [checkpoint: PENDING]

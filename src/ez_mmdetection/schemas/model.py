@@ -1,18 +1,69 @@
 from enum import Enum
+from typing import Dict
+
+# --- Model Registry Data ---
+# Organized by architecture family for easy maintenance
+
+RTM_DET_CONFIGS = {
+    "rtmdet_tiny": "rtmdet/rtmdet_tiny_8xb32-300e_coco.py",
+    "rtmdet_s": "rtmdet/rtmdet_s_8xb32-300e_coco.py",
+    "rtmdet_m": "rtmdet/rtmdet_m_8xb32-300e_coco.py",
+    "rtmdet_l": "rtmdet/rtmdet_l_8xb32-300e_coco.py",
+    "rtmdet_x": "rtmdet/rtmdet_x_8xb32-300e_coco.py",
+}
+
+RTM_DET_INS_CONFIGS = {
+    "rtmdet-ins_tiny": "rtmdet/rtmdet-ins_tiny_8xb32-300e_coco.py",
+    "rtmdet-ins_s": "rtmdet/rtmdet-ins_s_8xb32-300e_coco.py",
+    "rtmdet-ins_m": "rtmdet/rtmdet-ins_m_8xb32-300e_coco.py",
+    "rtmdet-ins_l": "rtmdet/rtmdet-ins_l_8xb32-300e_coco.py",
+    "rtmdet-ins_x": "rtmdet/rtmdet-ins_x_8xb16-300e_coco.py",
+}
+
+RTM_DET_URLS = {
+    "rtmdet_tiny": "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet_tiny_8xb32-300e_coco/rtmdet_tiny_8xb32-300e_coco_20220902_112414-78e30dcc.pth",
+    "rtmdet_s": "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet_s_8xb32-300e_coco/rtmdet_s_8xb32-300e_coco_20220905_161602-387a891e.pth",
+    "rtmdet_m": "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet_m_8xb32-300e_coco/rtmdet_m_8xb32-300e_coco_20220719_112220-229f527c.pth",
+    "rtmdet_l": "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet_l_8xb32-300e_coco/rtmdet_l_8xb32-300e_coco_20220719_112030-5a0be7c4.pth",
+    "rtmdet_x": "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet_x_8xb32-300e_coco/rtmdet_x_8xb32-300e_coco_20220715_230555-cc79b9ae.pth",
+}
+
+RTM_DET_INS_URLS = {
+    "rtmdet-ins_tiny": "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet-ins_tiny_8xb32-300e_coco/rtmdet-ins_tiny_8xb32-300e_coco_20221130_151727-ec670f7e.pth",
+    "rtmdet-ins_s": "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet-ins_s_8xb32-300e_coco/rtmdet-ins_s_8xb32-300e_coco_20221121_212604-fdc5d7ec.pth",
+    "rtmdet-ins_m": "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet-ins_m_8xb32-300e_coco/rtmdet-ins_m_8xb32-300e_coco_20221123_001039-6eba602e.pth",
+    "rtmdet-ins_l": "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet-ins_l_8xb32-300e_coco/rtmdet-ins_l_8xb32-300e_coco_20221124_103237-78d1d652.pth",
+    "rtmdet-ins_x": "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet-ins_x_8xb16-300e_coco/rtmdet-ins_x_8xb16-300e_coco_20221124_111313-33d4595b.pth",
+}
+
+# Unified Master Maps
+MODEL_CONFIG_MAP = {**RTM_DET_CONFIGS, **RTM_DET_INS_CONFIGS}
+MODEL_URLS = {**RTM_DET_URLS, **RTM_DET_INS_URLS}
+
 
 class ModelName(str, Enum):
     """Currently supported model architectures in ez_mmdet."""
-    
+
     # Bounding Box detection
     RTM_DET_TINY = "rtmdet_tiny"
     RTM_DET_S = "rtmdet_s"
     RTM_DET_M = "rtmdet_m"
     RTM_DET_L = "rtmdet_l"
     RTM_DET_X = "rtmdet_x"
-    
+
     # Instance Segmentation
     RTM_DET_INS_TINY = "rtmdet-ins_tiny"
     RTM_DET_INS_S = "rtmdet-ins_s"
     RTM_DET_INS_M = "rtmdet-ins_m"
     RTM_DET_INS_L = "rtmdet-ins_l"
     RTM_DET_INS_X = "rtmdet-ins_x"
+
+    @property
+    def config_path(self) -> str:
+        """Returns the relative config path for this model."""
+        return MODEL_CONFIG_MAP[self.value]
+
+    @property
+    def weights_url(self) -> str:
+        """Returns the official download URL for this model's weights."""
+        return MODEL_URLS[self.value]
