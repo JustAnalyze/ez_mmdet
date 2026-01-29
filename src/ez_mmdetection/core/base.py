@@ -9,6 +9,7 @@ from mmengine.config import Config
 from mmengine.runner import Runner
 
 from ez_mmdetection.core.config_loader import get_config_file
+from ez_mmdetection.core.handlers import DataloaderHandler, RuntimeHandler # New import
 from ez_mmdetection.schemas.dataset import DatasetConfig
 from ez_mmdetection.schemas.inference import InferenceResult
 from ez_mmdetection.schemas.model import ModelName
@@ -120,7 +121,7 @@ class EZMMDetector(ABC):
         learning_rate: float = 0.001,
         amp: bool = True,
         num_workers: int = 2,
-        enable_tensorboard: bool = False,
+        enable_tensorboard: bool = True,
         load_from: Optional[str] = None,
         log_level: Optional[str] = None,
     ) -> None:
@@ -212,86 +213,14 @@ class EZMMDetector(ABC):
         if not self._cfg:
             raise RuntimeError("Base config not loaded.")
 
-        self._cfg.work_dir = config.training.work_dir
-        self._cfg.train_cfg.max_epochs = config.training.epochs
-        self._cfg.load_from = config.model.load_from
+        # Delegate configuration to modular handlers
+        DataloaderHandler().apply(self._cfg, config)
+        RuntimeHandler().apply(self._cfg, config)
 
-        if hasattr(self._cfg, "optim_wrapper"):
-            if config.training.amp:
-                self._cfg.optim_wrapper.type = "AmpOptimWrapper"
-                self._cfg.optim_wrapper.loss_scale = "dynamic"
-            else:
-                self._cfg.optim_wrapper.type = "OptimWrapper"
-                if hasattr(self._cfg.optim_wrapper, "loss_scale"):
-                    del self._cfg.optim_wrapper["loss_scale"]
-
-            if hasattr(self._cfg.optim_wrapper, "optimizer"):
-                self._cfg.optim_wrapper.optimizer.lr = config.training.learning_rate
-
-        self._cfg.log_level = config.training.log_level
-
-        # Data roots and paths
-        data_root = Path(config.data.root)
-        self._cfg.data_root = str(data_root)
-
-        for key in ["train_dataloader", "val_dataloader", "test_dataloader"]:
-            if hasattr(self._cfg, key):
-                dl = getattr(self._cfg, key)
-                # Setting data_root to empty string to prevent double-joining
-                dl.dataset.data_root = ""
-                dl.batch_size = config.training.batch_size
-                dl.num_workers = config.training.num_workers
-
-                # Use absolute paths for annotations and images
-                if key == "train_dataloader":
-                    dl.dataset.ann_file = str(data_root / config.data.train_ann)
-                    dl.dataset.data_prefix = {
-                        "img": str(data_root / config.data.train_img)
-                    }
-                else:
-                    dl.dataset.ann_file = str(data_root / config.data.val_ann)
-                    dl.dataset.data_prefix = {
-                        "img": str(data_root / config.data.val_img)
-                    }
-
-                if config.data.classes:
-                    dl.dataset.metainfo = {"classes": config.data.classes}
-
-        # Also set metainfo at the top level of the config if possible
-        if config.data.classes:
-            self._cfg.metainfo = {"classes": config.data.classes}
-
-        # Configure TensorBoard backend
-        if config.training.enable_tensorboard:
-            # Ensure visualizer exists and has vis_backends list
-            if not hasattr(self._cfg, "visualizer"):
-                self._cfg.visualizer = dict(
-                    type="DetLocalVisualizer",
-                    vis_backends=[dict(type="LocalVisBackend")],
-                )
-
-            if "vis_backends" not in self._cfg.visualizer:
-                self._cfg.visualizer["vis_backends"] = [dict(type="LocalVisBackend")]
-
-            # Check if TensorboardVisBackend is already there
-            has_tb = False
-            for backend in self._cfg.visualizer["vis_backends"]:
-                if backend["type"] == "TensorboardVisBackend":
-                    has_tb = True
-                    break
-
-            if not has_tb:
-                self._cfg.visualizer["vis_backends"].append(
-                    dict(type="TensorboardVisBackend")
-                )
-
-        # Override Evaluators
-        # Evaluators often need absolute paths if data_root isn't explicitly used by them
-        if hasattr(self._cfg, "val_evaluator"):
-            self._cfg.val_evaluator.ann_file = str(data_root / config.data.val_ann)
-        if hasattr(self._cfg, "test_evaluator"):
-            test_ann = config.data.test_ann or config.data.val_ann
-            self._cfg.test_evaluator.ann_file = str(data_root / test_ann)
+    @abstractmethod
+    def _configure_model_specifics(self, config: UserConfig) -> None:
+        """Subclasses must implement this to handle architecture-specific overrides."""
+        pass
 
     @abstractmethod
     def _configure_model_specifics(self, config: UserConfig) -> None:

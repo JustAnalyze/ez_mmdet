@@ -14,8 +14,8 @@
 
 ## Phase 2: Refactor EZMMDetector [checkpoint: PENDING]
 
-- [ ] Task: Integrate Handlers into `EZMMDetector`
-    - [ ] Modify `_apply_common_overrides` to instantiate and use the new handlers.
+- [~] Task: Integrate Handlers into `EZMMDetector`
+    - [~] Modify `_apply_common_overrides` to instantiate and use the new handlers.
     - [ ] Remove the old, in-lined configuration logic.
 - [ ] Task: Verify Refactor
     - [ ] Run the existing full test suite to ensure no regression.
