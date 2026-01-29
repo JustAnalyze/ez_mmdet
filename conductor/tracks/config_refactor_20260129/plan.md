@@ -12,12 +12,12 @@
     - [x] Implement `RuntimeHandler`.
 - [x] Task: Conductor - User Manual Verification 'Configuration Handlers' (Protocol in workflow.md)
 
-## Phase 2: Refactor EZMMDetector [checkpoint: PENDING]
+## Phase 2: Refactor EZMMDetector [checkpoint: 7d640c4]
 
-- [~] Task: Integrate Handlers into `EZMMDetector`
-    - [~] Modify `_apply_common_overrides` to instantiate and use the new handlers.
-    - [ ] Remove the old, in-lined configuration logic.
-- [ ] Task: Verify Refactor
-    - [ ] Run the existing full test suite to ensure no regression.
-    - [ ] Verify that `user_config.toml` is still generated correctly.
-- [ ] Task: Conductor - User Manual Verification 'Refactor EZMMDetector' (Protocol in workflow.md)
+- [x] Task: Integrate Handlers into `EZMMDetector`
+    - [x] Modify `_apply_common_overrides` to instantiate and use the new handlers.
+    - [x] Remove the old, in-lined configuration logic.
+- [x] Task: Verify Refactor
+    - [x] Run the existing full test suite to ensure no regression.
+    - [x] Verify that `user_config.toml` is still generated correctly.
+- [x] Task: Conductor - User Manual Verification 'Refactor EZMMDetector' (Protocol in workflow.md)
