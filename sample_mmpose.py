@@ -1,11 +1,40 @@
+# from mmcv.image import imread
+
+from mmcv.image import imread
 from mmpose.apis import inference_topdown, init_model
-from mmpose.utils import register_all_modules
+from mmpose.registry import VISUALIZERS
+from mmpose.structures import merge_data_samples
 
-register_all_modules()
+# Keep this
+model_cfg = "./libs/mmpose/configs/body_2d_keypoint/rtmpose/coco/rtmpose-m_8xb256-420e_coco-256x192.py"
 
-config_file = "td-hm_hrnet-w48_8xb32-210e_coco-256x192.py"
-checkpoint_file = "td-hm_hrnet-w48_8xb32-210e_coco-256x192-0e67c616_20220913.pth"
-model = init_model(config_file, checkpoint_file, device="cpu")  # or device='cuda:0'
+# Use the matching COCO checkpoint
+ckpt = (
+    "./checkpoints/rtmpose-m_simcc-coco_pt-aic-coco_420e-256x192-d8dd5ca4_20230127.pth"
+)
 
-# please prepare an image with person
-results = inference_topdown(model, "demo.jpg")
+device = "cpu"
+
+# init model
+model = init_model(model_cfg, ckpt, device=device)
+
+img_path = (
+    "/home/kalebtata/Projects/ez_mmdet/datasets/coco128_coco/images/000000000036.jpg"
+)
+
+# inference on a single image
+batch_results = inference_topdown(model, img_path)
+
+# merge results as a single data sample
+results = merge_data_samples(batch_results)
+
+# build the visualizer
+visualizer = VISUALIZERS.build(model.cfg.visualizer)
+
+# set skeleton, colormap and joint connection rule
+visualizer.set_dataset_meta(model.dataset_meta)
+
+img = imread(img_path, channel_order="rgb")
+
+# visualize the results
+visualizer.add_datasample("result", img, data_sample=results, show=True)
