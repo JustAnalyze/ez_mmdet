@@ -13,9 +13,7 @@ class RTMDet(EZMMDetector):
     def _configure_model_specifics(self, config: UserConfig) -> None:
         """Overrides the bbox_head num_classes for RTMDet."""
         if not self._cfg:
-            raise RuntimeError(
-                "Config not loaded before configuring specifics."
-            )
+            raise RuntimeError("Config not loaded before configuring specifics.")
 
         model_cfg = config.model
         logger.info(

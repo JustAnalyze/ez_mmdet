@@ -11,3 +11,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Refactor base.py Configuration Logic**
   *Link: [./tracks/config_refactor_20260129/](./tracks/config_refactor_20260129/)*
+
+---
+
+- [~] **Track: Comprehensive Testing Infrastructure**
+  *Link: [./tracks/testing_infra_20260129/](./tracks/testing_infra_20260129/)*

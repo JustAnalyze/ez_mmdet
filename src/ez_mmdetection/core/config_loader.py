@@ -3,11 +3,6 @@ from typing import Dict
 
 from loguru import logger
 
-
-from pathlib import Path
-from typing import Dict
-
-from loguru import logger
 from ez_mmdetection.schemas.model import ModelName
 
 # Strict mapping of supported model names to their relative config paths within libs/mmdetection/configs/
@@ -18,7 +13,6 @@ MODEL_CONFIG_MAP: Dict[str, str] = {
     ModelName.RTM_DET_M.value: "rtmdet/rtmdet_m_8xb32-300e_coco.py",
     ModelName.RTM_DET_L.value: "rtmdet/rtmdet_l_8xb32-300e_coco.py",
     ModelName.RTM_DET_X.value: "rtmdet/rtmdet_x_8xb32-300e_coco.py",
-    
     # Instance Segmentation
     ModelName.RTM_DET_INS_TINY.value: "rtmdet/rtmdet-ins_tiny_8xb32-300e_coco.py",
     ModelName.RTM_DET_INS_S.value: "rtmdet/rtmdet-ins_s_8xb32-300e_coco.py",
@@ -27,6 +21,7 @@ MODEL_CONFIG_MAP: Dict[str, str] = {
     ModelName.RTM_DET_INS_X.value: "rtmdet/rtmdet-ins_x_8xb16-300e_coco.py",
 }
 
+
 class ConfigLoader:
     """Resolves model names to absolute paths of official MMDetection config files."""
 
@@ -34,9 +29,7 @@ class ConfigLoader:
         # Assumes the script is running from the project root where 'libs/mmdetection' exists
         self._project_root = Path.cwd()
         self._config_root = self._project_root / "libs" / "mmdetection" / "configs"
-        logger.info(
-            f"Initializing ConfigLoader. Config root: {self._config_root}"
-        )
+        logger.info(f"Initializing ConfigLoader. Config root: {self._config_root}")
         self._validate_root()
 
     def _validate_root(self):
@@ -53,7 +46,7 @@ class ConfigLoader:
     def get_config_path(self, model_name: str) -> Path:
         """Resolves a model name to its absolute config path."""
         rel_path = MODEL_CONFIG_MAP.get(model_name)
-        
+
         if not rel_path:
             logger.error(f"Model '{model_name}' is not supported or recognized.")
             supported = ", ".join(list(MODEL_CONFIG_MAP.keys()))
@@ -63,7 +56,7 @@ class ConfigLoader:
             )
 
         config_path = self._config_root / rel_path
-        
+
         if not config_path.exists():
             logger.error(f"Config file for '{model_name}' missing at: {config_path}")
             raise FileNotFoundError(
