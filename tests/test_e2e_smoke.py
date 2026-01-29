@@ -13,7 +13,7 @@ def smoke_test_data():
     if not data_toml.exists():
         # Fallback to coco128 if mini not created (though we just created it)
         data_toml = Path("datasets/coco128_coco/dataset.toml")
-        
+
     if not data_toml.exists():
         pytest.skip("No dummy data found for smoke test.")
     return data_toml
@@ -56,3 +56,4 @@ def test_e2e_train_predict_loop(smoke_test_data, tmp_path):
         len(result.predictions) >= 0
     )  # Successful if no crash and returns list
     print(f"E2E Smoke Test passed. Found {len(result.predictions)} objects.")
+
