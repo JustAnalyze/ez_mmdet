@@ -36,7 +36,8 @@ If `uv sync` fails (often due to MMDetection's complex build requirements), you 
 
 ```bash
 # 1. Install build-essential tools first
-uv pip install setuptools>=69.5.1 --index-strategy unsafe-best-match
+uv pip install "setuptools>=69.5.1" --index-strategy unsafe-best-match
+uv pip install wheels
 
 # 2. Install the Torch engine required for building
 uv pip install torch==2.0.1+cpu --index https://download.pytorch.org/whl/cpu
@@ -49,7 +50,8 @@ uv sync --extra cpu --preview
 
 ```bash
 # 1. Install build-essential tools first
-uv pip install setuptools>=69.5.1 --index-strategy unsafe-best-match
+uv pip install "setuptools>=69.5.1" --index-strategy unsafe-best-match
+uv pip install wheels
 
 # 2. Install the Torch engine required for building
 uv pip install torch==2.0.1+cu117 --index https://download.pytorch.org/whl/cu117
