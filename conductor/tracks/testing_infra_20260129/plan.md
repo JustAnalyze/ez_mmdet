@@ -25,10 +25,10 @@
 
 ## Phase 3: E2E Smoke Tests & Coverage Audit [checkpoint: PENDING]
 
-- [ ] Task: Implement E2E Smoke tests
-    - [ ] Create a minimal end-to-end test that runs a 1-epoch training pass on dummy data (CPU)
-    - [ ] Verify that the generated checkpoint can be loaded for a successful `predict()` call
-- [ ] Task: Final Coverage Audit
-    - [ ] Run the full suite with `pytest-cov` and ensure total coverage is >80%
+- [x] Task: Implement E2E Smoke tests
+    - [x] Create a minimal end-to-end test that runs a 1-epoch training pass on dummy data (CPU)
+    - [x] Verify that the generated checkpoint can be loaded for a successful `predict()` call
+- [~] Task: Final Coverage Audit
+    - [~] Run the full suite with `pytest-cov` and ensure total coverage is >80%
     - [ ] Generate and store the final coverage report
 - [ ] Task: Conductor - User Manual Verification 'E2E & Coverage' (Protocol in workflow.md)
