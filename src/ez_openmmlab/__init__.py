@@ -21,7 +21,7 @@ except Exception:
 register_all_modules(init_default_scope=True)
 
 from .models.mmdet import RTMDet
-from .models.mmpose import RTMPose
+from .models.mmpose import RTMPose, RTMO
 from .core.base import EZMMLab
 from .engines.mmdet import EZMMDetector
 from .engines.mmpose import EZMMPose

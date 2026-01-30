@@ -27,6 +27,12 @@ RTM_POSE_CONFIGS = {
     "rtmpose_l": "body_2d_keypoint/rtmpose/coco/rtmpose-l_8xb256-420e_coco-256x192.py",
 }
 
+RTMO_CONFIGS = {
+    "rtmo_s": "body_2d_keypoint/rtmo/coco/rtmo-s_8xb32-600e_coco-640x640.py",
+    "rtmo_m": "body_2d_keypoint/rtmo/coco/rtmo-m_16xb16-600e_coco-640x640.py",
+    "rtmo_l": "body_2d_keypoint/rtmo/coco/rtmo-l_16xb16-600e_coco-640x640.py",
+}
+
 RTM_DET_URLS = {
     "rtmdet_tiny": "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet_tiny_8xb32-300e_coco/rtmdet_tiny_8xb32-300e_coco_20220902_112414-78e30dcc.pth",
     "rtmdet_s": "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet_s_8xb32-300e_coco/rtmdet_s_8xb32-300e_coco_20220905_161602-387a891e.pth",
@@ -50,9 +56,25 @@ RTM_POSE_URLS = {
     "rtmpose_l": "https://download.openmmlab.com/mmpose/v1/projects/rtmposev1/rtmpose-l_simcc-coco_pt-aic-coco_420e-256x192-1352a4d2_20230127.pth",
 }
 
+RTMO_URLS = {
+    "rtmo_s": "https://download.openmmlab.com/mmpose/v1/projects/rtmo/rtmo-s_8xb32-600e_coco-640x640-8db55a59_20231211.pth",
+    "rtmo_m": "https://download.openmmlab.com/mmpose/v1/projects/rtmo/rtmo-m_16xb16-600e_coco-640x640-6f4e0306_20231211.pth",
+    "rtmo_l": "https://download.openmmlab.com/mmpose/v1/projects/rtmo/rtmo-l_16xb16-600e_coco-640x640-516a421f_20231211.pth",
+}
+
 # Unified Master Maps
-MODEL_CONFIG_MAP = {**RTM_DET_CONFIGS, **RTM_DET_INS_CONFIGS, **RTM_POSE_CONFIGS}
-MODEL_URLS = {**RTM_DET_URLS, **RTM_DET_INS_URLS, **RTM_POSE_URLS}
+MODEL_CONFIG_MAP = {
+    **RTM_DET_CONFIGS,
+    **RTM_DET_INS_CONFIGS,
+    **RTM_POSE_CONFIGS,
+    **RTMO_CONFIGS,
+}
+MODEL_URLS = {
+    **RTM_DET_URLS,
+    **RTM_DET_INS_URLS,
+    **RTM_POSE_URLS,
+    **RTMO_URLS,
+}
 
 
 class ModelName(str, Enum):
@@ -67,7 +89,6 @@ class ModelName(str, Enum):
 
     # Instance Segmentation
     RTM_DET_INS_TINY = "rtmdet-ins_tiny"
-    # Note: Value in MODEL_CONFIG_MAP uses hyphen for ins, consistent with ModelName values
     RTM_DET_INS_S = "rtmdet-ins_s"
     RTM_DET_INS_M = "rtmdet-ins_m"
     RTM_DET_INS_L = "rtmdet-ins_l"
@@ -79,6 +100,11 @@ class ModelName(str, Enum):
     RTM_POSE_M = "rtmpose_m"
     RTM_POSE_L = "rtmpose_l"
 
+    # Pose Estimation (RTMO)
+    RTMO_S = "rtmo_s"
+    RTMO_M = "rtmo_m"
+    RTMO_L = "rtmo_l"
+
     @property
     def config_path(self) -> str:
         """Returns the relative config path for this model."""
@@ -88,4 +114,3 @@ class ModelName(str, Enum):
     def weights_url(self) -> str:
         """Returns the official download URL for this model's weights."""
         return MODEL_URLS[self.value]
-

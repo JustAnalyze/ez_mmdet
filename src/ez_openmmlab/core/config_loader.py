@@ -41,7 +41,7 @@ class ConfigLoader:
             )
 
         # Determine which library root to use
-        if "rtmpose" in model_name:
+        if "rtmpose" in model_name or "rtmo" in model_name:
             config_root = self._mmpose_config_root
         else:
             config_root = self._mmdet_config_root

@@ -71,6 +71,31 @@ class EZMMLab(ABC):
         """Abstract method for performing inference."""
         pass
 
+    def switch_to_lib_root(self):
+        """Context manager to temporarily switch to the appropriate library root.
+
+        This is necessary because OpenMMLab configs use relative paths
+        that expect to be resolved from the library root (libs/mmdet or libs/mmpose).
+        """
+        import os
+        from contextlib import contextmanager
+
+        @contextmanager
+        def _switch():
+            if "rtmpose" in self.model_name or "rtmo" in self.model_name:
+                lib_root = Path.cwd() / "libs" / "mmpose"
+            else:
+                lib_root = Path.cwd() / "libs" / "mmdetection"
+
+            old_cwd = os.getcwd()
+            try:
+                os.chdir(lib_root)
+                yield lib_root
+            finally:
+                os.chdir(old_cwd)
+
+        return _switch()
+
     def train(
         self,
         dataset_config_path: Union[str, Path],
@@ -159,7 +184,13 @@ class EZMMLab(ABC):
 
     def _load_base_config(self, model_name: str) -> Config:
         config_path = get_config_file(model_name)
-        return Config.fromfile(config_path)
+
+        with self.switch_to_lib_root() as lib_root:
+            # Use relative path from lib_root
+            rel_config_path = config_path.relative_to(lib_root)
+            cfg = Config.fromfile(str(rel_config_path))
+
+        return cfg
 
     def _apply_common_overrides(self, config: UserConfig) -> None:
         """Applies configuration changes common to all architectures."""

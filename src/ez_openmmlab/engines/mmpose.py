@@ -33,8 +33,8 @@ class EZMMPose(EZMMLab):
         
         Args:
             image_path: Path to the input image.
-            det_model: Detector model name or config path.
-            det_weights: Path to detector weights.
+            det_model: Detector model name or config path (ignored for bottom-up models).
+            det_weights: Path to detector weights (ignored for bottom-up models).
             bbox_thr: Bounding box score threshold.
             kpt_thr: Keypoint score threshold.
             device: Computing device ('cuda', 'cpu').
@@ -44,26 +44,39 @@ class EZMMPose(EZMMLab):
         if self._inferencer is None:
             config_path = get_config_file(self.model_name)
             
-            # Resolve detector config if it's a known model name
-            actual_det_model = det_model
-            if det_model in [m.value for m in ModelName]:
-                actual_det_model = str(get_config_file(det_model))
+            # Bottom-up models (RTMO) don't need a separate detector
+            is_bottomup = "rtmo" in self.model_name
             
-            # Resolve detector weights if not provided
-            actual_det_weights = det_weights
-            if det_model and not det_weights:
-                actual_det_weights = str(ensure_model_checkpoint(det_model))
+            actual_det_model = None
+            actual_det_weights = None
+            
+            if not is_bottomup:
+                # Resolve detector config if it's a known model name
+                actual_det_model = det_model
+                if det_model in [m.value for m in ModelName]:
+                    actual_det_model = str(get_config_file(det_model))
+                
+                # Resolve detector weights if not provided
+                actual_det_weights = det_weights
+                if det_model and not det_weights:
+                    actual_det_weights = str(ensure_model_checkpoint(det_model))
 
             logger.info(
                 f"Initializing pose inferencer for model: {self.model_name} (using config: {config_path})"
             )
-            self._inferencer = MMPoseInferencer(
-                pose2d=str(config_path),
-                pose2d_weights=str(self.checkpoint_path),
-                det_model=actual_det_model,
-                det_weights=actual_det_weights,
-                device=device,
-            )
+            
+            inferencer_kwargs = {
+                "pose2d": str(config_path),
+                "pose2d_weights": str(self.checkpoint_path),
+                "device": device
+            }
+            
+            if not is_bottomup:
+                inferencer_kwargs["det_model"] = actual_det_model
+                inferencer_kwargs["det_weights"] = actual_det_weights
+
+            with self.switch_to_lib_root():
+                self._inferencer = MMPoseInferencer(**inferencer_kwargs)
 
         logger.info(f"Running pose estimation on: {image_path}")
 
@@ -99,11 +112,26 @@ class EZMMPose(EZMMLab):
             raise RuntimeError("Config not loaded before configuring specifics.")
 
         # RTMPose specific overrides
-        if hasattr(self._cfg.model, "head"):
+        if "rtmpose" in self.model_name and hasattr(self._cfg.model, "head"):
             head = self._cfg.model.head
             logger.info(
                 f"[{self.__class__.__name__}] Setting model.head.out_channels to {config.model.num_classes}"
             )
             # In MMPose, num_classes for pose heads is often 'out_channels' or similar
             head.out_channels = config.model.num_classes
+        
+        # RTMO specific overrides
+        if "rtmo" in self.model_name and hasattr(self._cfg.model, "head"):
+            head = self._cfg.model.head
+            logger.info(
+                f"[{self.__class__.__name__}] Setting RTMO model.head.num_keypoints to {config.model.num_classes}"
+            )
+            head.num_keypoints = config.model.num_classes
+            
+            if hasattr(head, "head_module_cfg"):
+                logger.info(
+                    f"[{self.__class__.__name__}] Setting RTMO model.head.head_module_cfg.num_classes to 1 (person)"
+                )
+                # For COCO pose, num_classes in head_module is usually 1 (person)
+                head.head_module_cfg.num_classes = 1
 
