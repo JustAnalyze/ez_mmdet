@@ -6,9 +6,7 @@ class Prediction(BaseModel):
 
     label: int
     score: float
-    bbox: list[float] = Field(
-        description="Bounding box in [x1, y1, x2, y2] format"
-    )
+    bbox: list[float] = Field(description="Bounding box in [x1, y1, x2, y2] format")
 
 
 class InferenceResult(BaseModel):

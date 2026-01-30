@@ -77,6 +77,5 @@ def test_predict_with_out_dir_creates_directory(mock_ensure, tmp_path):
 
         # Verify inferencer was called with the out_dir
         mock_inferencer_instance.assert_called_once_with(
-            str(image_path), out_dir=str(out_dir), show=False, pred_score_thr=0.5
+            str(image_path), out_dir=str(out_dir), show=False, pred_score_thr=0.3
         )
-

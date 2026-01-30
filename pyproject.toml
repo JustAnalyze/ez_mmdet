@@ -152,4 +152,8 @@ testpaths = ["tests"]
 filterwarnings = [
     "ignore::pytest.PytestUnraisableExceptionWarning",
     "ignore::pytest.PytestUnhandledThreadExceptionWarning",
+    "ignore:Failed to add .*:UserWarning",
+    "ignore:torch.meshgrid:UserWarning",
+    "ignore:The bbox is out of bounds:UserWarning",
+    "ignore:The polygon is out of bounds:UserWarning",
 ]
