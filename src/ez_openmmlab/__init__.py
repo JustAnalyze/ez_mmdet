@@ -20,9 +20,10 @@ except Exception:
 # Ensure MMDet modules are registered with default scope immediately
 register_all_modules(init_default_scope=True)
 
-from .models.rtmdet import RTMDet
+from .models.mmdet import RTMDet
+from .models.mmpose import RTMPose
 from .core.base import EZMMLab
-from .core.detection import EZMMDetector
-from .core.pose import EZMMPose
+from .engines.mmdet import EZMMDetector
+from .engines.mmpose import EZMMPose
 
-__all__ = ["RTMDet", "EZMMLab", "EZMMDetector", "EZMMPose"]
+__all__ = ["RTMDet", "RTMPose", "EZMMLab", "EZMMDetector", "EZMMPose"]

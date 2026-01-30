@@ -36,3 +36,15 @@ img = imread(img_path, channel_order="rgb")
 
 # visualize the results
 visualizer.add_datasample("result", img, data_sample=results, show=True)
+
+# ANOTHER WAY TO VISUALIZE
+from mmpose.apis import visualize
+
+pred_instances = batch_results[0].pred_instances
+
+keypoints = pred_instances.keypoints
+keypoint_scores = pred_instances.keypoint_scores
+
+metainfo = "config/_base_/datasets/coco.py"
+
+visualize(img_path, keypoints, keypoint_scores, metainfo=metainfo, show=True)

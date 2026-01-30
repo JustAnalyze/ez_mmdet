@@ -121,6 +121,7 @@ class EZMMLab(ABC):
                 test_ann=dataset_cfg.test.ann_file if dataset_cfg.test else None,
                 test_img=dataset_cfg.test.img_dir if dataset_cfg.test else None,
                 classes=self.classes,
+                metainfo=dataset_cfg.metainfo,
             ),
             training=TrainingSection(
                 epochs=epochs,

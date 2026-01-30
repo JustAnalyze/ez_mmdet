@@ -56,10 +56,21 @@ class DataloaderHandler(BaseConfigHandler):
 
                 if user_config.data.classes:
                     dl.dataset.metainfo = {"classes": user_config.data.classes}
+                
+                # Priority override with full metainfo dict
+                if user_config.data.metainfo:
+                    if not hasattr(dl.dataset, "metainfo") or dl.dataset.metainfo is None:
+                        dl.dataset.metainfo = {}
+                    dl.dataset.metainfo.update(user_config.data.metainfo)
 
         # Also set metainfo at the top level of the config if possible
         if user_config.data.classes:
             cfg.metainfo = {"classes": user_config.data.classes}
+        
+        if user_config.data.metainfo:
+            if not hasattr(cfg, "metainfo") or cfg.metainfo is None:
+                cfg.metainfo = {}
+            cfg.metainfo.update(user_config.data.metainfo)
 
 
 class RuntimeHandler(BaseConfigHandler):

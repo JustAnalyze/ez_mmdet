@@ -3,8 +3,9 @@ from typing import Optional
 
 import typer
 
-from ez_openmmlab import RTMDet
-from ez_openmmlab.schemas.model import ModelName  # New import
+from ez_openmmlab.models.mmdet import RTMDet
+from ez_openmmlab.models.mmpose import RTMPose
+from ez_openmmlab.schemas.model import ModelName
 
 app = typer.Typer(help="ez_mmdet: A user-friendly CLI for MMDetection")
 
@@ -49,19 +50,35 @@ def predict(
         None, help="Optional path to a custom model checkpoint (.pth)"
     ),
     confidence: float = typer.Option(0.3, help="Confidence threshold for detections"),
+    bbox_thr: float = typer.Option(
+        0.3, help="Bounding box score threshold (pose estimation)"
+    ),
+    kpt_thr: float = typer.Option(
+        0.3, help="Keypoint score threshold (pose estimation)"
+    ),
     out_dir: Optional[str] = typer.Option(
         "runs/preds", help="Directory to save visualization results"
     ),
     device: str = typer.Option("cpu", help="Computing device"),
 ):
-    """Performs object detection on an image."""
-    detector = RTMDet(model_name=model_name, checkpoint_path=checkpoint_path)
-    detector.predict(
-        image_path=image_path,
-        confidence=confidence,
-        out_dir=out_dir,
-        device=device,
-    )
+    """Performs object detection or pose estimation on an image."""
+    if "rtmpose" in model_name.value:
+        detector = RTMPose(model_name=model_name, checkpoint_path=checkpoint_path)
+        detector.predict(
+            image_path=image_path,
+            bbox_thr=bbox_thr,
+            kpt_thr=kpt_thr,
+            out_dir=out_dir,
+            device=device,
+        )
+    else:
+        detector = RTMDet(model_name=model_name, checkpoint_path=checkpoint_path)
+        detector.predict(
+            image_path=image_path,
+            confidence=confidence,
+            out_dir=out_dir,
+            device=device,
+        )
 
 
 if __name__ == "__main__":

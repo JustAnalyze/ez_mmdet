@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 from ez_openmmlab import RTMDet
 from ez_openmmlab.schemas.model import ModelName
 
-@patch("ez_openmmlab.core.detection.DetInferencer")
+@patch("ez_openmmlab.engines.mmdet.DetInferencer")
 @patch("ez_openmmlab.core.base.ensure_model_checkpoint")
 def test_predict_handles_none_out_dir(mock_ensure, mock_inferencer_cls):
     """
@@ -26,7 +26,7 @@ def test_predict_handles_none_out_dir(mock_ensure, mock_inferencer_cls):
     args, kwargs = mock_inferencer_instance.call_args
     assert kwargs["out_dir"] == ""
 
-@patch("ez_openmmlab.core.detection.DetInferencer")
+@patch("ez_openmmlab.engines.mmdet.DetInferencer")
 @patch("ez_openmmlab.core.base.ensure_model_checkpoint")
 def test_predict_resolves_config_path(mock_ensure, mock_inferencer_cls):
     """

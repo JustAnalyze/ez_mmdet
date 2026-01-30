@@ -10,10 +10,11 @@ from ez_openmmlab.schemas.model import ModelName
 
 from pydantic import BaseModel, Field, ConfigDict
 
+
 # --- Pydantic Models for Validation ---
 class ModelSection(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    
+
     name: ModelName = ModelName.RTM_DET_TINY
     num_classes: int = Field(..., gt=0)
     load_from: Optional[str] = None
@@ -21,7 +22,7 @@ class ModelSection(BaseModel):
 
 class DataSection(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    
+
     root: str
     train_ann: str = "annotations/instances_train2017.json"
     train_img: str = "train2017/"
@@ -30,11 +31,12 @@ class DataSection(BaseModel):
     test_ann: Optional[str] = None
     test_img: Optional[str] = None
     classes: Optional[List[str]] = None
+    metainfo: Optional[dict] = None
 
 
 class TrainingSection(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    
+
     epochs: int = Field(100, gt=0)
     batch_size: int = Field(8, gt=0)
     num_workers: int = Field(2, ge=0, description="Number of dataloader workers")
@@ -48,6 +50,7 @@ class TrainingSection(BaseModel):
 
 class UserConfig(BaseModel):
     """The master schema for config.toml."""
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     model: ModelSection

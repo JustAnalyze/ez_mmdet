@@ -53,7 +53,7 @@ def test_train_orchestration_and_artifact_creation(mock_ensure, mock_runner, dum
     # Verify some key config overrides were applied (Integration between base.py and handlers)
 from ez_openmmlab.schemas.inference import InferenceResult
 
-@patch("ez_openmmlab.core.detection.DetInferencer")
+@patch("ez_openmmlab.engines.mmdet.DetInferencer")
 @patch("ez_openmmlab.core.base.ensure_model_checkpoint")
 def test_predict_result_conversion(mock_ensure, mock_inferencer_cls):
     """Verifies that predict() returns a structured InferenceResult."""

@@ -23,6 +23,8 @@ class EZMMPose(EZMMLab):
         image_path: Union[str, Path],
         det_model: Optional[str] = "rtmdet_tiny",
         det_weights: Optional[str] = None,
+        bbox_thr: float = 0.3,
+        kpt_thr: float = 0.3,
         device: str = "cuda",
         show: bool = False,
         out_dir: Optional[str] = None,
@@ -33,6 +35,8 @@ class EZMMPose(EZMMLab):
             image_path: Path to the input image.
             det_model: Detector model name or config path.
             det_weights: Path to detector weights.
+            bbox_thr: Bounding box score threshold.
+            kpt_thr: Keypoint score threshold.
             device: Computing device ('cuda', 'cpu').
             show: Whether to display results.
             out_dir: Directory to save visualization.
@@ -68,7 +72,9 @@ class EZMMPose(EZMMLab):
         results_gen = self._inferencer(
             str(image_path), 
             out_dir=out_dir if out_dir else None, 
-            show=show
+            show=show,
+            bbox_thr=bbox_thr,
+            kpt_thr=kpt_thr
         )
         
         # Consume generator to execute the work

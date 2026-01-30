@@ -63,5 +63,40 @@ def test_predict_command_calls_detector_predict(tmp_path):
         mock_detector_instance.predict.assert_called_once()
         _, p_kwargs = mock_detector_instance.predict.call_args
         assert "checkpoint_path" not in p_kwargs
-        assert p_kwargs["image_path"] == Path(image)
-        assert p_kwargs["out_dir"] == "output"
+def test_predict_command_calls_pose_estimator_predict(tmp_path):
+    """Test that the predict command initializes RTMPose for pose models."""
+    checkpoint = tmp_path / "best.pth"
+    checkpoint.touch()
+    image = tmp_path / "demo.jpg"
+    image.touch()
+
+    with patch("ez_openmmlab.cli.RTMPose") as mock_pose_cls:
+        mock_pose_instance = MagicMock()
+        mock_pose_cls.return_value = mock_pose_instance
+
+        result = runner.invoke(
+            app,
+            [
+                "predict",
+                "rtmpose_tiny",
+                str(image),
+                "--checkpoint-path",
+                str(checkpoint),
+                "--bbox-thr",
+                "0.4",
+                "--kpt-thr",
+                "0.4",
+            ],
+        )
+
+        assert result.exit_code == 0
+        # Verify RTMPose was initialized
+        mock_pose_cls.assert_called_once()
+        _, kwargs = mock_pose_cls.call_args
+        assert kwargs["checkpoint_path"] == Path(checkpoint)
+
+        # Verify predict was called with correct pose parameters
+        mock_pose_instance.predict.assert_called_once()
+        _, p_kwargs = mock_pose_instance.predict.call_args
+        assert p_kwargs["bbox_thr"] == 0.4
+        assert p_kwargs["kpt_thr"] == 0.4

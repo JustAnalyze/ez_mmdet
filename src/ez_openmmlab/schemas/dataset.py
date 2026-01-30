@@ -22,6 +22,9 @@ class DatasetConfig(BaseModel):
     classes: Optional[List[str]] = Field(
         None, description="Explicit class names for safety"
     )
+    metainfo: Optional[dict] = Field(
+        None, description="Task-specific metadata (e.g., keypoints for pose)"
+    )
 
     @classmethod
     def from_toml(cls, path: Path) -> "DatasetConfig":

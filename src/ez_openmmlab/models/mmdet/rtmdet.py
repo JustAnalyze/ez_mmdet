@@ -1,7 +1,7 @@
 from loguru import logger
 from pathlib import Path
 
-from ez_openmmlab.core.detection import EZMMDetector
+from ez_openmmlab.engines.mmdet import EZMMDetector
 from ez_openmmlab.utils.toml_config import UserConfig
 
 

@@ -14,6 +14,7 @@ from rich.progress import (
 
 from ez_openmmlab.schemas.model import ModelName
 
+
 def download_checkpoint(url: str, dest_path: Path) -> None:
     """Downloads a file from a URL to a destination path with a progress bar."""
     dest_path.parent.mkdir(parents=True, exist_ok=True)
@@ -35,9 +36,7 @@ def download_checkpoint(url: str, dest_path: Path) -> None:
     )
 
     with progress:
-        task_id = progress.add_task(
-            f"Downloading {filename}", total=total_size
-        )
+        task_id = progress.add_task(f"Downloading {filename}", total=total_size)
         with open(dest_path, "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
                 f.write(chunk)
@@ -77,13 +76,10 @@ def ensure_model_checkpoint(
                 f"Checkpoint not found at {path} and no download URL for {model_name}"
             )
             raise FileNotFoundError(f"Checkpoint not found at {path}")
-        logger.warning(
-            f"No default checkpoint URL found for model: {model_name}"
-        )
+        logger.warning(f"No default checkpoint URL found for model: {model_name}")
         return path
 
-    logger.info(
-        f"Checkpoint not found. Attempting automatic download to {path}..."
-    )
+    logger.info(f"Checkpoint not found. Attempting automatic download to {path}...")
     download_checkpoint(url, path)
     return path
+
