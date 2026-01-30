@@ -11,7 +11,7 @@ from ez_openmmlab.schemas.inference import InferenceResult
 from ez_openmmlab.utils.download import ensure_model_checkpoint
 
 # Force registration of MMDet modules
-register_all_modules()
+register_all_modules(init_default_scope=True)
 
 
 class EZMMDetector(EZMMLab):
@@ -26,7 +26,7 @@ class EZMMDetector(EZMMLab):
     def predict(
         self,
         image_path: Union[str, Path],
-        confidence: float = 0.5,
+        confidence: float = 0.3,
         device: str = "cuda",
         out_dir: Optional[str] = None,
         show: bool = False,
