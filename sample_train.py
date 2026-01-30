@@ -1,9 +1,11 @@
 from ez_openmmlab import RTMDet
 
-model = RTMDet("rtmdet_tiny")
+
+model = RTMDet(model_name="rtmdet_tiny")
 model.train(
-    "datasets/coco128_coco/dataset.toml",
+    "./tests/data/coco_mini/dataset.toml",
     work_dir="./runs/sample_train",
     device="cpu",
     amp=False,
+    epochs=10,
 )

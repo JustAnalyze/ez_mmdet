@@ -18,9 +18,7 @@ device = "cpu"
 # init model
 model = init_model(model_cfg, ckpt, device=device)
 
-img_path = (
-    "/home/kalebtata/Projects/ez_mmdet/datasets/coco128_coco/images/000000000036.jpg"
-)
+img_path = "./tests/data/coco_mini/images/000000000389.jpg"
 
 # inference on a single image
 batch_results = inference_topdown(model, img_path)

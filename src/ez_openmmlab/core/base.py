@@ -20,11 +20,17 @@ from ez_openmmlab.utils.toml_config import (
     save_user_config,
 )
 
+
 class EZMMLab(ABC):
     """Abstract base class for all OpenMMLab libraries (Detection, Pose, etc.).
 
     Implements shared logic for configuration management and training workflows.
     """
+
+    model_name: str
+    log_level: str
+    checkpoint_path: Path
+    _cfg: Optional[Config]
 
     def __init__(
         self,
@@ -43,22 +49,19 @@ class EZMMLab(ABC):
             f"Initializing {self.__class__.__name__} with base model: '{model_name}'"
         )
         self.model_name: str = (
-            model_name.value
-            if isinstance(model_name, ModelName)
-            else model_name
+            model_name.value if isinstance(model_name, ModelName) else model_name
         )
         self.log_level: str = log_level
         self._cfg: Optional[Config] = None
 
         # Resolve or download checkpoint
-        self.checkpoint_path = ensure_model_checkpoint(
-            self.model_name, checkpoint_path
-        )
+        self.checkpoint_path = ensure_model_checkpoint(self.model_name, checkpoint_path)
 
         # Configure loguru level
         try:
             logger.remove()
             import sys
+
             logger.add(sys.stderr, level=log_level)
         except Exception as e:
             logger.warning(f"Failed to set log level: {e}")
@@ -79,26 +82,35 @@ class EZMMLab(ABC):
         amp: bool = True,
         num_workers: int = 4,
         enable_tensorboard: bool = False,
-        load_from: Optional[str] = None,
         log_level: Optional[str] = None,
     ) -> None:
-        """Shared training workflow definition."""
+        """Runs the end-to-end training pipeline.
+
+        Args:
+            dataset_config_path: Path to the dataset.toml definition.
+            epochs: Number of training epochs.
+            batch_size: Total batch size for training.
+            device: Training hardware ('cuda', 'cpu', 'mps').
+            work_dir: Directory for logs and checkpoints.
+            learning_rate: Initial learning rate.
+            amp: Enable Automatic Mixed Precision.
+            num_workers: Number of data loading workers.
+            enable_tensorboard: Enable TensorBoard visualization.
+            log_level: Override for internal framework logging.
+        """
         target_log_level = log_level or self.log_level
-        final_load_from = load_from or str(self.checkpoint_path)
 
         logger.info(f"Loading dataset configuration from: {dataset_config_path}")
         dataset_cfg = DatasetConfig.from_toml(Path(dataset_config_path))
 
         self.classes = dataset_cfg.classes
-        self.num_classes: int = (
-            len(dataset_cfg.classes) if dataset_cfg.classes else 80
-        )
+        self.num_classes: int = len(dataset_cfg.classes) if dataset_cfg.classes else 80
 
         user_config = UserConfig(
             model=ModelSection(
                 name=self.model_name,
                 num_classes=self.num_classes,
-                load_from=final_load_from,
+                load_from=str(self.checkpoint_path),
             ),
             data=DataSection(
                 root=str(dataset_cfg.data_root),
@@ -135,7 +147,9 @@ class EZMMLab(ABC):
         self._cfg = self._load_base_config(config.model.name)
         self._apply_common_overrides(config)
 
-        logger.info(f"Configuring architecture specifics for {self.__class__.__name__}...")
+        logger.info(
+            f"Configuring architecture specifics for {self.__class__.__name__}..."
+        )
         self._configure_model_specifics(config)
 
         logger.info("Starting MMEngine Runner...")

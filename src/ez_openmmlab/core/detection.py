@@ -13,12 +13,15 @@ from ez_openmmlab.utils.download import ensure_model_checkpoint
 # Force registration of MMDet modules
 register_all_modules()
 
+
 class EZMMDetector(EZMMLab):
     """Abstract base class for training and inference using MMDetection."""
 
+    _inferencer: Optional[DetInferencer]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._inferencer: Optional[DetInferencer] = None
+        self._inferencer = None
 
     def predict(
         self,
@@ -28,7 +31,15 @@ class EZMMDetector(EZMMLab):
         out_dir: Optional[str] = None,
         show: bool = False,
     ) -> InferenceResult:
-        """Performs object detection on an image."""
+        """Runs object detection on an image and returns structured results.
+
+        Args:
+            image_path: Path to the input image.
+            checkpoint_path: Optional path to a .pth file. Defaults to the one in __init__.
+            device: Computing device ('cuda', 'cpu').
+            out_dir: Directory to save visualization images.
+            show: Whether to pop up a window with the result.
+        """
         target_checkpoint = self.checkpoint_path
         if checkpoint_path:
             target_checkpoint = ensure_model_checkpoint(
@@ -47,9 +58,7 @@ class EZMMDetector(EZMMLab):
             )
 
         logger.info(f"Running inference on: {image_path}")
-        results = self._inferencer(
-            str(image_path), out_dir=out_dir or "", show=show
-        )
+        results = self._inferencer(str(image_path), out_dir=out_dir or "", show=show)
         return InferenceResult.from_mmdet(results)
 
     def _configure_model_specifics(self, config):

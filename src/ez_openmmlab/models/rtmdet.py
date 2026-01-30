@@ -1,14 +1,21 @@
 from loguru import logger
+from pathlib import Path
 
 from ez_openmmlab.core.detection import EZMMDetector
 from ez_openmmlab.utils.toml_config import UserConfig
 
 
 class RTMDet(EZMMDetector):
-    """RTMDet implementation of the EZDetector.
+    """RTMDet implementation for fast object detection and instance segmentation.
 
-    Handles the specific configuration for RTMDet models (one-stage detectors).
+    Args:
+        model_name: Name of the RTMDet variant (e.g., 'rtmdet_tiny', 'rtmdet-ins_s').
+        checkpoint_path: Path to a custom .pth file. If None, it will use the official pretrained weights.
+        log_level: Global logging level for the internal engine ('INFO', 'WARNING', 'ERROR').
     """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def _configure_model_specifics(self, config: UserConfig) -> None:
         """Overrides the bbox_head num_classes for RTMDet."""
