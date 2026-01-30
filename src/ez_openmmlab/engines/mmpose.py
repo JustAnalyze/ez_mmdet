@@ -63,17 +63,27 @@ class EZMMPose(EZMMLab):
 
         logger.info(f"Running pose estimation on: {image_path}")
 
-        # MMPoseInferencer returns a generator or dict based on input
-        # We wrap it to get the raw results
-        results = self._inferencer(str(image_path), out_dir=out_dir or "", show=show)
+        # MMPoseInferencer is a generator. We must iterate/list it to trigger 
+        # the internal logic (inference, visualization, and saving).
+        results_gen = self._inferencer(
+            str(image_path), 
+            out_dir=out_dir if out_dir else None, 
+            show=show
+        )
+        
+        # Consume generator to execute the work
+        all_results = list(results_gen)
 
-        # Result format: {'predictions': [[{'keypoints': [...], 'keypoint_scores': [...]}, ...]], 'visualization': [...]}
-        # We need the inner predictions list
+        # MMPose yields a dict for each image (or batch). 
+        # In our case (single image), we take the first result.
+        # Format: {'predictions': [[{'keypoints': [...], 'keypoint_scores': [...]}, ...]], 'visualization': [...]}
         raw_preds = []
-        if isinstance(results, dict) and "predictions" in results:
-            # Flatten the nested lists if necessary
-            for batch in results["predictions"]:
-                raw_preds.extend(batch)
+        if all_results:
+            first_result = all_results[0]
+            if "predictions" in first_result:
+                # MMPose 1.x returns nested predictions [batch][instances]
+                for batch in first_result["predictions"]:
+                    raw_preds.extend(batch)
 
         return PoseInferenceResult.from_mmpose(raw_preds)
 
