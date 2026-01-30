@@ -35,7 +35,7 @@ def test_e2e_train_predict_loop(smoke_test_data, tmp_path):
         amp=False,
         work_dir=str(work_dir),
         log_level="WARNING",
-        num_workers=0,
+        num_workers=4,
     )
 
     # 2. Verify checkpoint was created
@@ -45,7 +45,7 @@ def test_e2e_train_predict_loop(smoke_test_data, tmp_path):
     # 3. Run Inference using the new checkpoint
     # Re-initialize detector with the new checkpoint
     eval_detector = RTMDet(ModelName.RTM_DET_TINY, checkpoint_path=checkpoint)
-    
+
     # We use an image from the mini dataset for inference
     image_path = list(Path("tests/data/coco_mini/images").rglob("*.jpg"))[0]
     result = eval_detector.predict(
@@ -54,8 +54,5 @@ def test_e2e_train_predict_loop(smoke_test_data, tmp_path):
     )
 
     # 4. Verify structured result
-    assert (
-        len(result.predictions) >= 0
-    )  # Successful if no crash and returns list
+    assert len(result.predictions) >= 0  # Successful if no crash and returns list
     print(f"E2E Smoke Test passed. Found {len(result.predictions)} objects.")
-

@@ -23,7 +23,7 @@ def test_predict_handles_none_out_dir(mock_ensure, mock_inferencer_cls):
     
     # Verify DetInferencer was called with out_dir=""
     mock_inferencer_instance.assert_called_once()
-    _, kwargs = mock_inferencer_instance.call_args
+    args, kwargs = mock_inferencer_instance.call_args
     assert kwargs["out_dir"] == ""
 
 @patch("ez_openmmlab.core.detection.DetInferencer")
