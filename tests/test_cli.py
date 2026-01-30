@@ -35,12 +35,17 @@ def test_predict_command_calls_detector_predict(tmp_path):
         mock_detector_instance = MagicMock()
         mock_detector_cls.return_value = mock_detector_instance
         
-        result = runner.invoke(app, ["predict", "rtmdet_tiny", str(checkpoint), str(image), "--out-dir", "output"])
+        result = runner.invoke(app, ["predict", "rtmdet_tiny", str(image), "--checkpoint-path", str(checkpoint), "--out-dir", "output"])
         
         assert result.exit_code == 0
+        # Verify checkpoint_path was passed to constructor
         mock_detector_cls.assert_called_once()
+        args, kwargs = mock_detector_cls.call_args
+        assert kwargs["checkpoint_path"] == Path(checkpoint)
+        
+        # Verify predict was called without checkpoint_path
         mock_detector_instance.predict.assert_called_once()
-        _, kwargs = mock_detector_instance.predict.call_args
-        assert kwargs["checkpoint_path"] == checkpoint
-        assert kwargs["image_path"] == image
-        assert kwargs["out_dir"] == "output"
+        _, p_kwargs = mock_detector_instance.predict.call_args
+        assert "checkpoint_path" not in p_kwargs
+        assert p_kwargs["image_path"] == Path(image)
+        assert p_kwargs["out_dir"] == "output"

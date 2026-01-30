@@ -26,7 +26,7 @@ class EZMMDetector(EZMMLab):
     def predict(
         self,
         image_path: Union[str, Path],
-        checkpoint_path: Optional[Union[str, Path]] = None,
+        confidence: float = 0.5,
         device: str = "cuda",
         out_dir: Optional[str] = None,
         show: bool = False,
@@ -35,17 +35,11 @@ class EZMMDetector(EZMMLab):
 
         Args:
             image_path: Path to the input image.
-            checkpoint_path: Optional path to a .pth file. Defaults to the one in __init__.
+            confidence: Confidence threshold for filtering detections (default: 0.3).
             device: Computing device ('cuda', 'cpu').
             out_dir: Directory to save visualization images.
             show: Whether to pop up a window with the result.
         """
-        target_checkpoint = self.checkpoint_path
-        if checkpoint_path:
-            target_checkpoint = ensure_model_checkpoint(
-                self.model_name, checkpoint_path
-            )
-
         if self._inferencer is None:
             config_path = get_config_file(self.model_name)
             logger.info(
@@ -53,12 +47,14 @@ class EZMMDetector(EZMMLab):
             )
             self._inferencer = DetInferencer(
                 model=str(config_path),
-                weights=str(target_checkpoint),
+                weights=str(self.checkpoint_path),
                 device=device,
             )
 
-        logger.info(f"Running inference on: {image_path}")
-        results = self._inferencer(str(image_path), out_dir=out_dir or "", show=show)
+        logger.info(f"Running inference on: {image_path} (threshold: {confidence})")
+        results = self._inferencer(
+            str(image_path), out_dir=out_dir or "", show=show, pred_score_thr=confidence
+        )
         return InferenceResult.from_mmdet(results)
 
     def _configure_model_specifics(self, config):

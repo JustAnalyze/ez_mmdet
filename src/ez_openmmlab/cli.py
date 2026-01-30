@@ -44,18 +44,21 @@ def train(
 @app.command()
 def predict(
     model_name: ModelName = typer.Argument(..., help="Name of the model architecture"),
-    checkpoint_path: Path = typer.Argument(..., help="Path to the model checkpoint"),
     image_path: Path = typer.Argument(..., help="Path to the image for inference"),
+    checkpoint_path: Optional[Path] = typer.Option(
+        None, help="Optional path to a custom model checkpoint (.pth)"
+    ),
+    confidence: float = typer.Option(0.3, help="Confidence threshold for detections"),
     out_dir: Optional[str] = typer.Option(
         "runs/preds", help="Directory to save visualization results"
     ),
     device: str = typer.Option("cpu", help="Computing device"),
 ):
     """Performs object detection on an image."""
-    detector = RTMDet(model_name=model_name)
+    detector = RTMDet(model_name=model_name, checkpoint_path=checkpoint_path)
     detector.predict(
         image_path=image_path,
-        checkpoint_path=checkpoint_path,
+        confidence=confidence,
         out_dir=out_dir,
         device=device,
     )

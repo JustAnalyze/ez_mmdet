@@ -66,7 +66,7 @@ def test_predict_result_conversion(mock_ensure, mock_inferencer_cls):
     mock_inferencer_cls.return_value = mock_inferencer_instance
     
     detector = RTMDet(ModelName.RTM_DET_TINY)
-    result = detector.predict(image_path="dummy.jpg", checkpoint_path="dummy.pth")
+    result = detector.predict(image_path="dummy.jpg")
     
     assert isinstance(result, InferenceResult)
     assert len(result.predictions) == 1

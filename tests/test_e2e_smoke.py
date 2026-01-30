@@ -43,11 +43,13 @@ def test_e2e_train_predict_loop(smoke_test_data, tmp_path):
     assert checkpoint.exists()
 
     # 3. Run Inference using the new checkpoint
+    # Re-initialize detector with the new checkpoint
+    eval_detector = RTMDet(ModelName.RTM_DET_TINY, checkpoint_path=checkpoint)
+    
     # We use an image from the mini dataset for inference
     image_path = list(Path("tests/data/coco_mini/images").rglob("*.jpg"))[0]
-    result = detector.predict(
+    result = eval_detector.predict(
         image_path=str(image_path),
-        checkpoint_path=str(checkpoint),
         device="cpu",
     )
 
