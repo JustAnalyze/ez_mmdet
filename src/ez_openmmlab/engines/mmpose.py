@@ -7,6 +7,7 @@ from mmpose.apis import MMPoseInferencer
 
 from ez_openmmlab.core.base import EZMMLab
 from ez_openmmlab.schemas.inference import PoseInferenceResult
+from ez_openmmlab.utils.path import get_unique_dir
 
 
 class EZMMPose(EZMMLab):
@@ -44,19 +45,15 @@ class EZMMPose(EZMMLab):
 
         # MMPoseInferencer is a generator. We must iterate/list it to trigger
         # the internal logic (inference, visualization, and saving).
-        
-        # Explicitly handle out_dir to ensure subdirectories are set up correctly
+
+        actual_out_dir = str(get_unique_dir(out_dir)) if out_dir else None
+
         inferencer_kwargs = {
             "inputs": str(image_path),
             "show": show,
-            **kwargs
+            "out_dir": actual_out_dir,
+            **kwargs,
         }
-        
-        if out_dir:
-            # We explicitly pass these to be safe, as MMPoseInferencer's internal
-            # logic for 'out_dir' might skip if the directory already exists.
-            inferencer_kwargs["vis_out_dir"] = f"{out_dir}/visualizations"
-            inferencer_kwargs["pred_out_dir"] = f"{out_dir}/predictions"
 
         results_gen = self._inferencer(**inferencer_kwargs)
 

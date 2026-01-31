@@ -9,6 +9,7 @@ from ez_openmmlab.core.base import EZMMLab
 from ez_openmmlab.core.config_loader import get_config_file
 from ez_openmmlab.schemas.inference import InferenceResult
 from ez_openmmlab.utils.download import ensure_model_checkpoint
+from ez_openmmlab.utils.path import get_unique_dir
 
 # Force registration of MMDet modules
 register_all_modules(init_default_scope=True)
@@ -52,8 +53,14 @@ class EZMMDetector(EZMMLab):
             )
 
         logger.info(f"Running inference on: {image_path} (threshold: {confidence})")
+        
+        actual_out_dir = str(get_unique_dir(out_dir)) if out_dir else ""
+        
         results = self._inferencer(
-            str(image_path), out_dir=out_dir or "", show=show, pred_score_thr=confidence
+            str(image_path), 
+            out_dir=actual_out_dir, 
+            show=show, 
+            pred_score_thr=confidence
         )
         return InferenceResult.from_mmdet(results)
 
