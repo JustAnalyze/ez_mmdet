@@ -48,6 +48,10 @@ class EZMMLab(ABC):
         logger.info(
             f"Initializing {self.__class__.__name__} with base model: '{model_name}'"
         )
+        # Ensure noisy warnings are suppressed when engine starts
+        from ez_openmmlab import mute_warnings
+        mute_warnings()
+
         self.model_name: str = (
             model_name.value if isinstance(model_name, ModelName) else model_name
         )

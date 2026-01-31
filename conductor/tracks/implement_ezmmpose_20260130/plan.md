@@ -19,11 +19,11 @@
   - [x] Implement `_configure_model_specifics()` for pose.
 - [x] Task: Conductor - User Manual Verification 'EZMMPose Implementation' (Protocol in workflow.md)
 
-## Phase 3: Training & Verification [checkpoint: PENDING]
+## Phase 3: Training & Verification [checkpoint: 4828539]
 
-- [~] Task: Implement Pose Training Support
-  - [~] Update dataloader handlers to support `metainfo` injection for pose datasets.
-- [ ] Task: E2E Verification
-  - [ ] Create E2E smoke test for pose estimation (using `sample_mmpose.py` as reference).
-  - [ ] Verify detection smoke tests still pass.
-- [ ] Task: Conductor - User Manual Verification 'Training & Verification' (Protocol in workflow.md)
+- [x] Task: Implement Pose Training Support
+  - [x] Update dataloader handlers to support `metainfo` injection for pose datasets.
+- [x] Task: E2E Verification
+  - [x] Create E2E smoke test for pose estimation (using `sample_mmpose.py` as reference).
+  - [x] Verify detection smoke tests still pass.
+- [x] Task: Conductor - User Manual Verification 'Training & Verification' (Protocol in workflow.md)

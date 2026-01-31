@@ -8,4 +8,5 @@ result = detector.predict(
     device="cpu",
     show=True,
     confidence=0.5,
+    out_dir="./runs/rtmdet_preds",
 )

@@ -3,10 +3,10 @@ from ez_openmmlab import RTMPose
 model = RTMPose("rtmpose_s")
 
 model.predict(
-    image_path="./tests/data/coco_mini/images/000000000389.jpg",
+    image_path="./tests/data/test_image.jpg",
     device="cpu",
     show=True,
     out_dir="./runs/rtmpose_preds",
-    bbox_thr=0.5,
-    kpt_thr=0.5
+    bbox_thr=0.4,
+    kpt_thr=0.5,
 )

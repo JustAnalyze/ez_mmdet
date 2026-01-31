@@ -4,10 +4,10 @@ from ez_openmmlab import RTMO
 model = RTMO("rtmo_s")
 
 model.predict(
-    image_path="./tests/data/coco_mini/images/000000000389.jpg",
+    image_path="./tests/data/coco_mini/images/000000000564.jpg",
     device="cpu",
     show=True,
     out_dir="./runs/rtmo_preds",
-    bbox_thr=0.5,
-    kpt_thr=0.5
+    bbox_thr=0.7,
+    kpt_thr=0.7,
 )

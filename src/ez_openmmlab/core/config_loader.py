@@ -2,26 +2,28 @@ from pathlib import Path
 from loguru import logger
 from ez_openmmlab.schemas.model import ModelName
 
+
 class ConfigLoader:
     """Resolves model names to absolute paths of official OpenMMLab config files."""
 
     def __init__(self):
         # Assumes the script is running from the project root
         self._project_root = Path.cwd()
-        self._mmdet_config_root = self._project_root / "libs" / "mmdetection" / "configs"
-        self._mmpose_config_root = self._project_root / "libs" / "mmpose" / "configs"
-        
-        logger.info(
-            f"Initializing ConfigLoader. Project root: {self._project_root}"
+        self._mmdet_config_root = (
+            self._project_root / "libs" / "mmdetection" / "configs"
         )
+        self._mmpose_config_root = self._project_root / "libs" / "mmpose" / "configs"
+
+        logger.info(f"Initializing ConfigLoader. Project root: {self._project_root}")
         self._validate_root()
 
     def _validate_root(self):
         """Ensures at least one config root exists."""
-        if not self._mmdet_config_root.exists() and not self._mmpose_config_root.exists():
-            logger.error(
-                f"Could not find local OpenMMLab configs."
-            )
+        if (
+            not self._mmdet_config_root.exists()
+            and not self._mmpose_config_root.exists()
+        ):
+            logger.error(f"Could not find local OpenMMLab configs.")
             raise FileNotFoundError(
                 "Could not find local mmdetection or mmpose configs.\n"
                 "Ensure submodules are initialized."
@@ -47,7 +49,7 @@ class ConfigLoader:
             config_root = self._mmdet_config_root
 
         config_path = config_root / rel_path
-        
+
         if not config_path.exists():
             logger.error(f"Config file for '{model_name}' missing at: {config_path}")
             raise FileNotFoundError(
