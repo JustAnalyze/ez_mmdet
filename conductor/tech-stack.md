@@ -1,10 +1,11 @@
-# Technology Stack: ez_mmdet
+# Technology Stack: ez_openmmlab
 
 ## Core Languages & Runtimes
 - **Python (>=3.9, <3.11):** The primary programming language. The version constraint is strictly enforced by the underlying MMDetection and MMCV requirements.
 
 ## Frameworks & Libraries
 - **MMDetection (v3.3.0):** The base framework for all computer vision tasks. Integrated as a Git submodule in `libs/mmdetection`.
+- **MMPose (v1.3.1):** The primary framework for pose estimation tasks. Integrated as a Git submodule in `libs/mmpose`.
 - **MMEngine (>=0.10.7):** The underlying training engine used by MMDetection.
 - **Pydantic (>=2.0.0):** Used for strict data validation of all user-provided TOML configurations and API parameters.
 - **Typer (>=0.9.0):** The framework for building the `ez-mmdet` CLI.
