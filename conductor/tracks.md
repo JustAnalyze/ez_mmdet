@@ -14,5 +14,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Implement EZMMPose Support**
+- [x] **Track: Implement EZMMPose Support**
   *Link: [./tracks/implement_ezmmpose_20260130/](./tracks/implement_ezmmpose_20260130/)*
