@@ -1,104 +1,75 @@
+from abc import abstractmethod
 from pathlib import Path
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
 from loguru import logger
 from mmpose.apis import MMPoseInferencer
 
 from ez_openmmlab.core.base import EZMMLab
-from ez_openmmlab.core.config_loader import get_config_file
 from ez_openmmlab.schemas.inference import PoseInferenceResult
-from ez_openmmlab.schemas.model import ModelName
-from ez_openmmlab.utils.download import ensure_model_checkpoint
 
 
 class EZMMPose(EZMMLab):
-    """Abstract base class for training and inference using MMPose."""
+    """Base engine for MMPose models.
+
+    Provides shared utilities for interacting with MMPoseInferencer.
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._inferencer: Optional[MMPoseInferencer] = None
 
-    def predict(
+    @abstractmethod
+    def predict(self, image_path: Union[str, Path], **kwargs) -> PoseInferenceResult:
+        """Subclasses must implement specific inference logic."""
+        pass
+
+    def _execute_mmpose_inferencer(
         self,
         image_path: Union[str, Path],
-        det_model: Optional[str] = "rtmdet_tiny",
-        det_weights: Optional[str] = None,
-        bbox_thr: float = 0.3,
-        kpt_thr: float = 0.3,
-        device: str = "cuda",
-        show: bool = False,
         out_dir: Optional[str] = None,
+        show: bool = False,
+        **kwargs,
     ) -> PoseInferenceResult:
-        """Runs pose estimation on an image and returns structured results.
-        
-        Args:
-            image_path: Path to the input image.
-            det_model: Detector model name or config path (ignored for bottom-up models).
-            det_weights: Path to detector weights (ignored for bottom-up models).
-            bbox_thr: Bounding box score threshold.
-            kpt_thr: Keypoint score threshold.
-            device: Computing device ('cuda', 'cpu').
-            show: Whether to display results.
-            out_dir: Directory to save visualization.
+        """Shared execution logic for MMPoseInferencer.
+
+        Consumes the generator and parses results into a PoseInferenceResult.
         """
         if self._inferencer is None:
-            config_path = get_config_file(self.model_name)
-            
-            # Bottom-up models (RTMO) don't need a separate detector
-            is_bottomup = "rtmo" in self.model_name
-            
-            actual_det_model = None
-            actual_det_weights = None
-            
-            if not is_bottomup:
-                # Resolve detector config if it's a known model name
-                actual_det_model = det_model
-                if det_model in [m.value for m in ModelName]:
-                    actual_det_model = str(get_config_file(det_model))
-                
-                # Resolve detector weights if not provided
-                actual_det_weights = det_weights
-                if det_model and not det_weights:
-                    actual_det_weights = str(ensure_model_checkpoint(det_model))
-
-            logger.info(
-                f"Initializing pose inferencer for model: {self.model_name} (using config: {config_path})"
+            raise RuntimeError(
+                "Inferencer not initialized. Call init_inferencer first."
             )
-            
-            inferencer_kwargs = {
-                "pose2d": str(config_path),
-                "pose2d_weights": str(self.checkpoint_path),
-                "device": device
-            }
-            
-            if not is_bottomup:
-                inferencer_kwargs["det_model"] = actual_det_model
-                inferencer_kwargs["det_weights"] = actual_det_weights
-
-            with self.switch_to_lib_root():
-                self._inferencer = MMPoseInferencer(**inferencer_kwargs)
 
         logger.info(f"Running pose estimation on: {image_path}")
 
-        # MMPoseInferencer is a generator. We must iterate/list it to trigger 
+        # MMPoseInferencer is a generator. We must iterate/list it to trigger
         # the internal logic (inference, visualization, and saving).
-        results_gen = self._inferencer(
-            str(image_path), 
-            out_dir=out_dir if out_dir else None, 
-            show=show,
-            bbox_thr=bbox_thr,
-            kpt_thr=kpt_thr
-        )
         
+        # Explicitly handle out_dir to ensure subdirectories are set up correctly
+        inferencer_kwargs = {
+            "inputs": str(image_path),
+            "show": show,
+            **kwargs
+        }
+        
+        if out_dir:
+            # We explicitly pass these to be safe, as MMPoseInferencer's internal
+            # logic for 'out_dir' might skip if the directory already exists.
+            inferencer_kwargs["vis_out_dir"] = f"{out_dir}/visualizations"
+            inferencer_kwargs["pred_out_dir"] = f"{out_dir}/predictions"
+
+        results_gen = self._inferencer(**inferencer_kwargs)
+
         # Consume generator to execute the work
         all_results = list(results_gen)
 
-        # MMPose yields a dict for each image (or batch). 
-        # In our case (single image), we take the first result.
+        # MMPose yields a dict for each image (or batch).
         # Format: {'predictions': [[{'keypoints': [...], 'keypoint_scores': [...]}, ...]], 'visualization': [...]}
         raw_preds = []
         if all_results:
-            first_result = all_results[0]
+            first_result = all_results[
+                0
+            ]  # FIX: WHAT IF WE ARE INFERENCING ON MULTIPLE IMAGE?
             if "predictions" in first_result:
                 # MMPose 1.x returns nested predictions [batch][instances]
                 for batch in first_result["predictions"]:
@@ -106,32 +77,7 @@ class EZMMPose(EZMMLab):
 
         return PoseInferenceResult.from_mmpose(raw_preds)
 
+    @abstractmethod
     def _configure_model_specifics(self, config):
-        """Pose specific overrides (e.g., keypoint head num_classes)."""
-        if not self._cfg:
-            raise RuntimeError("Config not loaded before configuring specifics.")
-
-        # RTMPose specific overrides
-        if "rtmpose" in self.model_name and hasattr(self._cfg.model, "head"):
-            head = self._cfg.model.head
-            logger.info(
-                f"[{self.__class__.__name__}] Setting model.head.out_channels to {config.model.num_classes}"
-            )
-            # In MMPose, num_classes for pose heads is often 'out_channels' or similar
-            head.out_channels = config.model.num_classes
-        
-        # RTMO specific overrides
-        if "rtmo" in self.model_name and hasattr(self._cfg.model, "head"):
-            head = self._cfg.model.head
-            logger.info(
-                f"[{self.__class__.__name__}] Setting RTMO model.head.num_keypoints to {config.model.num_classes}"
-            )
-            head.num_keypoints = config.model.num_classes
-            
-            if hasattr(head, "head_module_cfg"):
-                logger.info(
-                    f"[{self.__class__.__name__}] Setting RTMO model.head.head_module_cfg.num_classes to 1 (person)"
-                )
-                # For COCO pose, num_classes in head_module is usually 1 (person)
-                head.head_module_cfg.num_classes = 1
-
+        """Subclasses must implement architecture-specific overrides."""
+        pass
